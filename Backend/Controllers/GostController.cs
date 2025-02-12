@@ -33,22 +33,27 @@ namespace Backend.Controllers
 
         [HttpGet]
         [Route("{sifra:int}")]
-        public IActionResult GetBySifra(int sifra)
+        public IActionResult Get(int sifra)
         {
+            if (sifra <= 0)
+            {
+                return StatusCode(StatusCodes.Status404NotFound, new { poruka = "Šifra mora biti pozitivan broj" });
+            }
             try
             {
-                var s = _context.Gosti.Find(sifra);
-                if (s == null)
+                var smjer = _context.Gosti.Find(sifra);
+                if (smjer == null)
                 {
-                    return NotFound();
+                    return NotFound(new { poruka = $"Gost s šifrom {sifra} ne postoji" });
                 }
-                return Ok(s);
+                return Ok(smjer);
             }
             catch (Exception e)
             {
                 return BadRequest(e);
             }
         }
+
 
 
         [HttpPost]
@@ -85,17 +90,19 @@ namespace Backend.Controllers
             try
             {
 
-                var s = _context.Gosti.Find(sifra);
-                if (s == null)
+                var g = _context.Gosti.Find(sifra);
+                if (g == null)
                 {
-                    return NotFound();
+                    return NotFound(new { poruka = $"Gost s šifrom {sifra} ne postoji" });
                 }
+
                 //rucno mapiranje, kasnije automaper
-                s.Ime =gost.Ime;
-                s.Prezime = gost.Prezime;
-                s.BrojTelefon = gost.BrojTelefon;
-                s.Email = gost.Email;
-                _context.Gosti.Update(s);
+                g.Ime =gost.Ime;
+                g.Prezime = gost.Prezime;
+                g.BrojTelefon = gost.BrojTelefon;
+                g.Email = gost.Email;
+                
+                _context.Gosti.Update(g);
                 _context.SaveChanges();
                 return Ok(new { poruka = "Uspješno ažurirano" });
             }
@@ -105,22 +112,26 @@ namespace Backend.Controllers
                 return BadRequest(e);
             }
 
-        }
+        } 
 
         [HttpDelete]
         [Route("{sifra:int}")]
         public IActionResult Delete(int sifra)
         {
+            if (sifra <= 0)
+            {
+                return StatusCode(StatusCodes.Status404NotFound, new { poruka = "Šifra mora biti pozitivan broj" });
+            }
             try
             {
-                var s = _context.Gosti.Find(sifra);
-                if (s == null)
+                var smjer = _context.Gosti.Find(sifra);
+                if (smjer == null)
                 {
-                    return NotFound();
+                    return NotFound(new { poruka = $"Gost s šifrom {sifra} ne postoji" });
                 }
-                _context.Gosti.Remove(s);
+                _context.Gosti.Remove(smjer);
                 _context.SaveChanges();
-                return Ok(new { poruka = "Uspješno obrisano" });
+                return NoContent();
             }
             catch (Exception e)
             {
