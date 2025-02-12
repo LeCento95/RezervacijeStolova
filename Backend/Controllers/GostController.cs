@@ -9,11 +9,11 @@ namespace Backend.Controllers
 
 
 
-    public class GostiController: ControllerBase
+    public class GostController: ControllerBase
     {
         private readonly BackendContext _context;
 
-        public GostiController(BackendContext context)
+        public GostController(BackendContext context)
         {
             _context = context;
         }
