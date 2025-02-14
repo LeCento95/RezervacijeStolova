@@ -41,12 +41,12 @@ namespace Backend.Controllers
             }
             try
             {
-                var smjer = _context.Gosti.Find(sifra);
-                if (smjer == null)
+                var gost = _context.Gosti.Find(sifra);
+                if (gost == null)
                 {
                     return NotFound(new { poruka = $"Gost s šifrom {sifra} ne postoji" });
                 }
-                return Ok(smjer);
+                return Ok(gost);
             }
             catch (Exception e)
             {
@@ -124,8 +124,8 @@ namespace Backend.Controllers
             }
             try
             {
-                var smjer = _context.Gosti.Find(sifra);
-                if (smjer == null)
+                var gost = _context.Gosti.Find(sifra);
+                if (gost == null)
                 {
                     return NotFound(new { poruka = $"Gost s šifrom {sifra} ne postoji" });
                 }
