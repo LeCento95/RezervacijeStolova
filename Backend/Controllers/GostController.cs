@@ -129,7 +129,7 @@ namespace Backend.Controllers
                 {
                     return NotFound(new { poruka = $"Gost s šifrom {sifra} ne postoji" });
                 }
-                _context.Gosti.Remove(smjer);
+                _context.Gosti.Remove(gost);
                 _context.SaveChanges();
                 return NoContent();
             }
