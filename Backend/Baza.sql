@@ -1,11 +1,14 @@
-﻿use master;
-go
-drop database if exists RestoranRezervacije;
-go
-create database RestoranRezervacije collate Croatian_CI_AS;
-go
-use RestoranRezervacije;
-go
+﻿SELECT name, collation_name FROM sys.databases;
+GO
+ALTER DATABASE db_ab2d4c_restorantreservati SET SINGLE_USER WITH
+ROLLBACK IMMEDIATE;
+GO
+ALTER DATABASE db_ab2d4c_restorantreservati COLLATE Croatian_CI_AS;
+GO
+ALTER DATABASE db_ab2d4c_restorantreservati SET MULTI_USER;
+GO
+SELECT name, collation_name FROM sys.databases;
+GO
 
 
 create table Stolovi(
