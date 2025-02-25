@@ -15,7 +15,7 @@ export default function GostiDodaj(){
             alert(odgovor.poruka)
             return
         }
-        navigate(RouteNames.GOST__PREGLED)
+        navigate(RouteNames.GOST_PREGLED)
     }
 
     function odradiSubmit(e){ // e je event
@@ -56,7 +56,7 @@ export default function GostiDodaj(){
 
         <Form.Group controlId="email">
             <Form.Label>Email</Form.Label>
-            <Form.Check type="text" name="email" />
+            <Form.Control type="text" name="email" />
         </Form.Group>
 
         <hr/>

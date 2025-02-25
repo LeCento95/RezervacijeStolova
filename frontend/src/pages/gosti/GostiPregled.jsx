@@ -27,7 +27,7 @@ export default function GostiPregled(){
         if(!confirm('Sigurno obrisati')){
             return;
         }
-        brisanjeSmjera(sifra);
+        brisanjeGosta(sifra);
     }
 
     async function brisanjeGosta(sifra) {
@@ -66,7 +66,7 @@ export default function GostiPregled(){
                             {gost.prezime}
                         </td>
                         <td>
-                            {gost.brojTelefona}
+                            {gost.brojTelefon}
                         </td>
                         <td>
                             {gost.email}

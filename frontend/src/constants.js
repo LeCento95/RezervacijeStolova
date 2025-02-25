@@ -7,4 +7,4 @@ export const RouteNames={
     GOST_BRISANJE: '/gosti/obrisi/:sifra',
 }
 
-export const PRODUKCIJA='http://carics95-001-site1.ptempurl.com';
+export const PRODUKCIJA='https://carics95-001-site1.ptempurl.com';
