@@ -1,4 +1,4 @@
-import {Button, Col, From, Row} from "react-bootstrap";
+import {Button, Col, Row} from "react-bootstrap";
 import {Link, useNavigate, useParams} from "react-router-dom";
 import { RouteNames } from "../../constants";
 import moment from "moment";

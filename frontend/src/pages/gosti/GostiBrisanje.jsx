@@ -1,4 +1,4 @@
-import {Button, Col, From, Row} from "react-bootstrap";
+import {Button, Col, Row} from "react-bootstrap";
 import {Link, useNavigate, useParams} from "react-router-dom";
 import { RouteNames } from "../../constants";
 import GostService from "../../services/GostService";
@@ -6,7 +6,7 @@ import { useEffect, useState } from "react";
 
 export default function GostiBrisanje(){
     const navigate = useNavigate();
-    const [gosti,setGost]=useState({});
+    const [gost,setGost]=useState({});
     const routeParams = useParams();
 
     async function dohvatiGoste(){
@@ -30,7 +30,7 @@ export default function GostiBrisanje(){
         
     }
 
-    function OdradiSubmit(e){ // e je event
+    function odradiSubmit(e){ // e je event
         e.preventDefault(); //nemoj odraditi zahtjev na server na standardni način
         
         let podaci = new FormData(e.target);
