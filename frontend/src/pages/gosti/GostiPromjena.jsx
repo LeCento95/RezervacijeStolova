@@ -1,5 +1,5 @@
-import { Button, Col, Form, Row } from "react-bootstrap";
-import { Link, useNavigate, useParams } from "react-router-dom";
+import {Button, Col, From, Row} from "react-bootstrap";
+import {Link, useNavigate, useParams} from "react-router-dom";
 import { RouteNames } from "../../constants";
 import moment from "moment";
 import GostService from "../../services/GostService";
@@ -60,14 +60,14 @@ export default function GostiPromjena(){
         <Form.Group controlId="brojTelefona">
             <Form.Label>Broj Telefona</Form.Label>
             <Form.Control type="number" name="brojTelefona" 
-            defaultValue={gost.izvodiSeOd}/>
+            defaultValue={gost.brojTelefona}/>
         </Form.Group>
 
 
         <Form.Group controlId="email">
             <Form.Label>Email</Form.Label>
             <Form.Control type="text" name="email" 
-            defaultValue={gost.izvodiSeOd}/>
+            defaultValue={gost.email}/>
         </Form.Group>
         <hr/>
 
@@ -80,7 +80,7 @@ export default function GostiPromjena(){
             </Col>
             <Col xs={6} sm={6} md={9} lg={10} xl={6} xxl={6}>
                 <Button variant="success" type="submit" className="siroko">
-                    Promjeni gosta
+                    Promjeni smjer
                 </Button>
             </Col>
         </Row>

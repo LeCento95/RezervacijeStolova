@@ -1,26 +1,38 @@
-import { Button, Col, Form, Row } from "react-bootstrap";
-import { Link, useNavigate } from "react-router-dom";
+import {Button, Col, From, Row} from "react-bootstrap";
+import {Link, useNavigate, useParams} from "react-router-dom";
 import { RouteNames } from "../../constants";
-import moment from "moment";
 import GostService from "../../services/GostService";
+import { useEffect, useState } from "react";
 
-
-export default function GostiDodaj(){
-
+export default function GostiBrisanje(){
     const navigate = useNavigate();
+    const [gosti,setGost]=useState({});
+    const routeParams = useParams();
 
-    async function dodaj(gost){
-        const odgovor = await GostService.dodaj(gost);
+    async function dohvatiGoste(){
+        const odgovor=await GostService.getBySifra(routeParams.sifra)
+        setGost(odgovor)
+    }
+
+    useEffect(()=>{
+        dohvatiGoste();
+    },[])
+
+    async function obrisi (){
+        const odgovor= await GostService.obrisi(routeParams.sifra,gost);
         if(odgovor.greska){
             alert(odgovor.poruka)
             return
         }
-        navigate(RouteNames.GOST__PREGLED)
+        navigate(RouteNames.GOST_PREGLED)
+
+        
+        
     }
 
-    function odradiSubmit(e){ // e je event
-        e.preventDefault(); // nemoj odraditi zahtjev na server pa standardnom načinu
-
+    function OdradiSubmit(e){ // e je event
+        e.preventDefault(); //nemoj odraditi zahtjev na server na standardni način
+        
         let podaci = new FormData(e.target);
 
         dodaj(
@@ -31,32 +43,37 @@ export default function GostiDodaj(){
                 email: podaci.get('email')
             }
         );
+        
     }
-
+    
     return(
     <>
-    Dodavanje gosta
+    <h2 className="naslov">Brisanje gosta</h2>
     <Form onSubmit={odradiSubmit}>
 
         <Form.Group controlId="ime">
             <Form.Label>Ime</Form.Label>
-            <Form.Control type="text" name="ime" required />
+            <Form.Control type="text" name="ime" required 
+            defaultValue={gost.naziv}/>
         </Form.Group>
 
         <Form.Group controlId="Prezime">
             <Form.Label>Prezime</Form.Label>
-            <Form.Control type="text" name="prezime" required />
+            <Form.Control type="text" name="prezime" required
+            defaultValue={gost.prezime}/>
         </Form.Group>
 
         <Form.Group controlId="brojTelefona">
             <Form.Label>Broj Telefona</Form.Label>
-            <Form.Control type="number" name="brojTelefona" />
+            <Form.Control type="number" name="brojTelefona"
+            defaultValue={gost.brojTelefona}/>
         </Form.Group>
 
 
         <Form.Group controlId="email">
             <Form.Label>Email</Form.Label>
-            <Form.Check type="text" name="email" />
+            <Form.Check type="text" name="email"
+            defaultValue={gost.email}/>
         </Form.Group>
 
         <hr/>
@@ -70,7 +87,7 @@ export default function GostiDodaj(){
             </Col>
             <Col xs={6} sm={6} md={9} lg={10} xl={6} xxl={6}>
                 <Button variant="success" type="submit" className="siroko">
-                    Dodaj gosta
+                    Obriši gosta
                 </Button>
             </Col>
         </Row>

@@ -19,7 +19,7 @@ export default function NavBarRestorantReservation(){
                 <Navbar.Brand 
                 className='ruka'
                 onClick={()=>navigate(RouteNames.HOME)}
-                >RestorantReservation</Navbar.Brand>
+                >Gosti</Navbar.Brand>
                 <Navbar.Toggle aria-controls="basic-navbar-nav" />
                 <Navbar.Collapse id="basic-navbar-nav">
                 <Nav className="me-auto">

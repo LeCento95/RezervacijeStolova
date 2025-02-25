@@ -45,7 +45,7 @@ export default function GostiPregled(){
         <Link
         to={RouteNames.GOST_NOVI}
         className="btn btn-success siroko"
-        >Dodaj novi smjer</Link>
+        >Dodaj novog gosta</Link>
         <Table striped bordered hover responsive>
             <thead>
                 <tr>
@@ -72,20 +72,21 @@ export default function GostiPregled(){
                             {gost.email}
                         </td>
                        
-                      
-                        
-
-
-
-                        <td>
+                        <td style = {{display: "flex", gap: "10px"}}>
                             <Button
+                            style ={{ backgroundColor: '#7d3d9b', color: "white"}}
                             onClick={()=>navigate(`/gosti/${gost.sifra}`)}
-                            >Promjena</Button>
+                            >Promjena
+                            </Button>
                             &nbsp;&nbsp;&nbsp;
+                            
                             <Button
+                            style = {{ backgroundColor: '#9c989a', color: "white"}}
                             variant="danger"
                             onClick={()=>obrisi(gost.sifra)}
-                            >Obriši</Button>
+                            >
+                                Obriši
+                            </Button>
                         </td>
                     </tr>
                 ))}
