@@ -99,7 +99,7 @@ namespace Backend.Controllers
                 //rucno mapiranje, kasnije automaper
                 g.Ime =gost.Ime;
                 g.Prezime = gost.Prezime;
-                g.BrojTelefon = gost.BrojTelefon;
+                g.BrojTelefona = gost.BrojTelefona;
                 g.Email = gost.Email;
                 
                 _context.Gosti.Update(g);

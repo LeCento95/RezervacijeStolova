@@ -7,7 +7,7 @@ namespace Backend.Models
         public string? Ime { get; set; } = "";
         public string? Prezime { get; set; } = "";
         [Column("broj_telefona")]
-        public string? BrojTelefon { get; set; } = "";
+        public string? BrojTelefona { get; set; } = "";
         [Column("e_mail")]
         public string? Email { get; set; } = "";
     }
