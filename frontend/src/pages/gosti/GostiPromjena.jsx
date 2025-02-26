@@ -22,9 +22,9 @@ export default function GostiPromjena() {
     dohvatiGosta();
   }, [routeParams.sifra]);
 
-  async function promjeni(gost) {
+  async function promjena(gost) {
     try {
-      const odgovor = await GostService.promjeni(routeParams.sifra, gost);
+      const odgovor = await GostService.promjena(routeParams.sifra, gost);
       if (odgovor.greska) {
         alert(odgovor.poruka);
         return;
@@ -40,7 +40,7 @@ export default function GostiPromjena() {
 
     let podaci = new FormData(e.target);
 
-    promjeni({
+    promjena({
       ime: podaci.get("ime"),
       prezime: podaci.get("prezime"),
       brojTelefona: podaci.get("brojTelefona"),
