@@ -5,7 +5,7 @@
   "type": "module",
   "scripts": {
     "dev": "vite",
-    "build": "vite build",
+    "build": "vite build && rmdir ..\\RezervacijeStolova\\Backend\\wwwroot /s /q && move /y dist ../RezervacijeStolova/Backend/wwwroot",
     "lint": "eslint .",
     "preview": "vite preview"
   },

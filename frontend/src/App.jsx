@@ -15,6 +15,10 @@ import GostiBrisanje from './pages/gosti/GostiBrisanje'
 
 function App() {
 
+  function trenutnaGodina(){
+    return moment().year();
+  }
+
   return (
     <>
       <Container>
@@ -29,7 +33,7 @@ function App() {
         </Routes>
 
         <hr />
-        &copy; RestorantManagerReservation 2025
+        &copy; RestorantManagerReservation {trenutnaGodina()}
       </Container>
      
     </>
