@@ -29,7 +29,7 @@ function App() {
         </Routes>
 
         <hr />
-        &copy; RestorantReservation 2025
+        &copy; RestorantManagerReservation 2025
       </Container>
      
     </>
