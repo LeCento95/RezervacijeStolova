@@ -5,7 +5,7 @@
   "type": "module",
   "scripts": {
     "dev": "vite",
-    "build": "vite build && echo Current Directory: %cd% && dir C:\\Users\\PC\\Documents\\GitHub\\RezervacijeStolova\\Backend && if exist C:\\Users\\PC\\Documents\\GitHub\\RezervacijeStolova\\Backend\\wwwroot (rmdir C:\\Users\\PC\\Documents\\GitHub\\RezervacijeStolova\\Backend\\wwwroot /s /q) && move /y dist C:\\Users\\PC\\Documents\\GitHub\\RezervacijeStolova\\Backend\\wwwroot",
+    "build": "vite build && rmdir ..\\Backend\\wwwroot /s /q && move dist ..\\Backend\\wwwroot",
     "lint": "eslint .",
     "preview": "vite preview"
   },
