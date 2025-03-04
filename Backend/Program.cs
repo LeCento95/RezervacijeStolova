@@ -1,6 +1,12 @@
 ﻿using Backend.Data;
+using Backend.Mapping;
 using Microsoft.EntityFrameworkCore;
 
+// Dobro dodatno �itanje
+// 1. https://medium.com/@robhutton8/entity-framework-vs-repository-pattern-vs-unit-of-work-9fa093bd59e4
+// 2. https://www.thereformedprogrammer.net/is-the-repository-pattern-useful-with-entity-framework-core/
+// 3. https://medium.com/@rabinarayandev/should-you-use-uuids-for-database-keys-597b15b000bb
+// 4. https://blog.stackademic.com/goodbye-swagger-how-net-9-is-redefining-api-documentation-7488456a538f
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -9,25 +15,35 @@ var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddControllers();
 // Learn more about configuring OpenAPI at https://aka.ms/aspnet/openapi
 builder.Services.AddOpenApi();
-
-// dodati swagger
+// dodati ovu liniju za swagger
 builder.Services.AddSwaggerGen();
 
 
-// dodavanje db contexta
-builder.Services.AddDbContext<BackendContext>(o =>
-{
-    o.UseSqlServer(builder.Configuration.GetConnectionString("BackendContext"));
+// dodavanje kontaksta baze podataka - dependency injection
+builder.Services.AddDbContext<BackendContext>(options => {
+    options.UseSqlServer(builder.Configuration.GetConnectionString("BackendContext"));
 });
 
+
+// Svi se od svuda na sve moguce nacine mogu spojitina na� API
+// �itati https://code-maze.com/aspnetcore-webapi-best-practices/
+//  https://levelup.gitconnected.com/cors-finally-explained-simply-ae42b52a70a3
 builder.Services.AddCors(o => {
-    o.AddPolicy("CorsPolicy", b => {
-        b.AllowAnyOrigin().AllowAnyMethod().AllowAnyHeader();
+
+    o.AddPolicy("CorsPolicy", builder =>
+    {
+        builder.AllowAnyOrigin().AllowAnyMethod().AllowAnyHeader();
     });
+     
 });
+
+// automapper
+builder.Services.AddAutoMapper(typeof(BackendMappingProfile));
+
 
 var app = builder.Build();
 
+// Configure the HTTP request pipeline.
 app.MapOpenApi();
 
 
@@ -35,20 +51,20 @@ app.UseHttpsRedirection();
 
 app.UseAuthorization();
 
-// swagger sučelje
+// dodati ove dvije linije za swagger
 app.UseSwagger();
-app.UseSwaggerUI(o =>
-{
+app.UseSwaggerUI(o => {
     o.EnableTryItOutByDefault();
-    o.ConfigObject.AdditionalItems.Add("requesrSnippetsEnabled", true);
+    o.ConfigObject.AdditionalItems.Add("requestSnippetsEnabled", true);
 });
 
 app.MapControllers();
 
+app.UseCors("CorsPolicy");
+
+// za potrebe produkcije
 app.UseStaticFiles();
 app.UseDefaultFiles();
 app.MapFallbackToFile("index.html");
-
-app.UseCors("CorsPolicy");
 
 app.Run();

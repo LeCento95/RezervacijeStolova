@@ -4,22 +4,19 @@ using Backend.Models;
 using Backend.Models.DTO;
 using Microsoft.AspNetCore.Mvc;
 
-
 namespace Backend.Controllers
 {
-
     /// <summary>
-    /// Kontroler za upravljanje gostima u aplikaciji .
+    /// Kontroler za upravljanje narudžbama u aplikaciji.
     /// </summary>
     /// <param name="context">Kontekst baze podataka.</param>
     /// <param name="mapper">Mapper za mapiranje objekata.</param>
     [ApiController]
     [Route("api/v1/[controller]")]
-    public class GostController(BackendContext context, IMapper mapper) : BackendController(context, mapper)
+    public class NarudzbaController(BackendContext context, IMapper mapper) : BackendController(context, mapper)
     {
-
         [HttpGet]
-        public ActionResult<List<GostDTORead>> Get()
+        public ActionResult<List<NarudzbaDTORead>> Get()
         {
             if (!ModelState.IsValid)
             {
@@ -27,32 +24,31 @@ namespace Backend.Controllers
             }
             try
             {
-                return Ok(_mapper.Map<List<GostDTORead>>(_context.Gosti));
+                return Ok(_mapper.Map<List<NarudzbaDTORead>>(_context.Narudzbe));
             }
             catch (Exception ex)
             {
                 return BadRequest(new { poruka = ex.Message });
             }
-
         }
 
         /// <summary>
-        /// Dohvaća goste prema šifri.
+        /// Dohvaća narudžbu prema šifri.
         /// </summary>
-        /// <param name="sifra">Šifra gosta.</param>
-        /// <returns>Gost.</returns>
+        /// <param name="sifra">Šifra narudžbe.</param>
+        /// <returns>Narudžba.</returns>
         [HttpGet]
         [Route("{sifra:int}")]
-        public ActionResult<GostDTORead> GetBySifra(int sifra)
+        public ActionResult<NarudzbaDTORead> GetBySifra(int sifra)
         {
             if (!ModelState.IsValid)
             {
                 return BadRequest(new { poruka = ModelState });
             }
-            Gost? e;
+            Narudzba? e;
             try
             {
-                e = _context.Gosti.Find(sifra);
+                e = _context.Narudzbe.Find(sifra);
             }
             catch (Exception ex)
             {
@@ -60,20 +56,19 @@ namespace Backend.Controllers
             }
             if (e == null)
             {
-                return NotFound(new { poruka = "Gost ne postoji u bazi" });
+                return NotFound(new { poruka = "Narudžba ne postoji u bazi" });
             }
 
-            return Ok(_mapper.Map<GostDTORead>(e));
+            return Ok(_mapper.Map<NarudzbaDTORead>(e));
         }
 
-
         /// <summary>
-        /// Dodaje novog gosta u bazu podataka.
+        /// Dodaje novu narudžbu u bazu podataka.
         /// </summary>
-        /// <param name="dto">Podaci o gostu</param>
+        /// <param name="dto">Podaci o narudžbi.</param>
         /// <returns>Status kreiranja.</returns>
         [HttpPost]
-        public IActionResult Post(GostDTOInsertUpdate dto)
+        public IActionResult Post(NarudzbaDTOInsertUpdate dto)
         {
             if (!ModelState.IsValid)
             {
@@ -81,31 +76,27 @@ namespace Backend.Controllers
             }
             try
             {
-                var e = _mapper.Map<Gost>(dto);
-                _context.Gosti.Add(e);
+                var e = _mapper.Map<Narudzba>(dto);
+                _context.Narudzbe.Add(e);
                 _context.SaveChanges();
-                return StatusCode(StatusCodes.Status201Created, _mapper.Map<GostDTORead>(e));
+                return StatusCode(StatusCodes.Status201Created, _mapper.Map<NarudzbaDTORead>(e));
             }
             catch (Exception ex)
             {
                 return BadRequest(new { poruka = ex.Message });
             }
-
-
-
         }
 
-
         /// <summary>
-        /// Ažurira gosta prema šifri.
+        /// Ažurira narudžbu prema šifri.
         /// </summary>
-        /// <param name="sifra">šifra gosta.</param>
-        /// <param name="dto">Podaci o gostu.</param>
+        /// <param name="sifra">Šifra narudžbe.</param>
+        /// <param name="dto">Podaci o narudžbi.</param>
         /// <returns>Status ažuriranja.</returns>
         [HttpPut]
         [Route("{sifra:int}")]
         [Produces("application/json")]
-        public IActionResult Put(int sifra, GostDTOInsertUpdate dto)
+        public IActionResult Put(int sifra, NarudzbaDTOInsertUpdate dto)
         {
             if (!ModelState.IsValid)
             {
@@ -113,10 +104,10 @@ namespace Backend.Controllers
             }
             try
             {
-                Gost? e;
+                Narudzba? e;
                 try
                 {
-                    e = _context.Gosti.Find(sifra);
+                    e = _context.Narudzbe.Find(sifra);
                 }
                 catch (Exception ex)
                 {
@@ -124,11 +115,11 @@ namespace Backend.Controllers
                 }
                 if (e == null)
                 {
-                    return NotFound(new { poruka = "Gost ne postoji u bazi" });
+                    return NotFound(new { poruka = "Narudžba ne postoji u bazi" });
                 }
                 e = _mapper.Map(dto, e);
 
-                _context.Gosti.Update(e);
+                _context.Narudzbe.Update(e);
                 _context.SaveChanges();
 
                 return Ok(new { poruka = "Uspješno promijenjeno" });
@@ -137,14 +128,12 @@ namespace Backend.Controllers
             {
                 return BadRequest(new { poruka = ex.Message });
             }
-
         }
 
-
         /// <summary>
-        /// 
+        /// Briše narudžbu prema šifri.
         /// </summary>
-        /// <param name="sifra">Šifra gosta.</param>
+        /// <param name="sifra">Šifra narudžbe.</param>
         /// <returns>Status brisanja.</returns>
         [HttpDelete]
         [Route("{sifra:int}")]
@@ -157,10 +146,10 @@ namespace Backend.Controllers
             }
             try
             {
-                Gost? e;
+                Narudzba? e;
                 try
                 {
-                    e = _context.Gosti.Find(sifra);
+                    e = _context.Narudzbe.Find(sifra);
                 }
                 catch (Exception ex)
                 {
@@ -168,9 +157,9 @@ namespace Backend.Controllers
                 }
                 if (e == null)
                 {
-                    return NotFound("Gost ne postoji u bazi");
+                    return NotFound("Narudžba ne postoji u bazi");
                 }
-                _context.Gosti.Remove(e);
+                _context.Narudzbe.Remove(e);
                 _context.SaveChanges();
                 return Ok(new { poruka = "Uspješno obrisano" });
             }
@@ -179,9 +168,5 @@ namespace Backend.Controllers
                 return BadRequest(new { poruka = ex.Message });
             }
         }
-
-        
-
-
     }
 }
