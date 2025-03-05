@@ -4,13 +4,13 @@ namespace Backend.Models
 {
     public class Narudzba : Entitet
     {
-        
+    
+        [ForeignKey("rezervacija")]
+        public required Rezervacija Rezervacija { get; set; }
 
-        [ForeignKey("Rezervacija")]
-        public int Rezervacija { get; set; }
+        [ForeignKey("jelo")]
+        public required Jelovnik Jelovnik { get; set; }
 
-        [ForeignKey("Jelovnik")]
-        public int Jelo { get; set; }
 
         public int Kolicina { get; set; }
 

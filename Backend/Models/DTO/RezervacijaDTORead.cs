@@ -21,8 +21,7 @@
 
         int BrojOsoba,
 
-        string? Napomena,
+        string? Napomena
 
-        ICollection<NarudzbaDTORead> Narudzbe
     );
 }

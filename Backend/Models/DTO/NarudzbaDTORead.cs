@@ -12,10 +12,10 @@
 
         int Sifra,
 
-        RezervacijaDTORead Rezervacija,
-        
-        JelovnikDTORead Jelo,
-        
+        string RezervacijaGost,
+
+        string JelovnikNaziv,
+
         int Kolicina
 
         

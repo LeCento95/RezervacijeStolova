@@ -7,7 +7,6 @@ namespace Backend.Models
         [Column("broj_stola")]
         public int BrojStola { get; set; }
         public int Kapacitet { get; set; }
-        [Column("lokacija")]
         public string? Lokacija { get; set; } = "";
         
     }

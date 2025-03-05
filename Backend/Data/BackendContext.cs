@@ -14,17 +14,10 @@ namespace Backend.Data
         public DbSet<Gost> Gosti { get; set; }
         public DbSet<Stol> Stolovi { get; set; }
         public DbSet<Rezervacija> Rezervacije { get; set; }
-        public DbSet<Jelovnik> Jelovnik { get; set; }
         public DbSet<Narudzba> Narudzbe { get; set; }
+        public DbSet<Jelovnik> Jelovnik { get; set; }
 
-        protected override void OnModelCreating(ModelBuilder modelBuilder)
-        {
-            modelBuilder.Entity<Narudzba>()
-                .HasOne<Rezervacija>()
-                .WithMany()
-                .HasForeignKey(n => n.Rezervacija);
-                
+    
 
-        }
     }
 }

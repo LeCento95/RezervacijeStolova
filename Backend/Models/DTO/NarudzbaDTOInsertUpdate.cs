@@ -13,10 +13,8 @@ namespace Backend.Models.DTO
     public record NarudzbaDTOInsertUpdate(
 
      [Required(ErrorMessage = "Rezervacija je obavezna.")] 
-     int Rezervacija,
-     
-     [Required(ErrorMessage = "Jelo je obavezno.")] 
-     int Jelo,
+     int RezervacijaSifra,
+    
      
      [Required(ErrorMessage = "Količina je obavezna.")][Range(1, int.MaxValue, ErrorMessage = "Količina mora biti veća od 0.")] 
      int Kolicina

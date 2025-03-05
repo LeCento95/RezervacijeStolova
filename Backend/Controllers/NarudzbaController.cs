@@ -23,11 +23,15 @@ namespace Backend.Controllers
         [HttpGet]
         [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(IEnumerable<NarudzbaDTORead>))]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
-        public async Task<ActionResult<IEnumerable<NarudzbaDTORead>>> Get()
+        public ActionResult<IEnumerable<NarudzbaDTORead>> Get()
         {
             try
             {
-                var n = await _context.Narudzbe.ToListAsync();
+                var n = _context.Narudzbe
+                    .Include(n => n.Jelovnik)
+                    .Include(n=>n.Rezervacija).ThenInclude(r=>r.Gost).
+                    ToList();
+                //Console.WriteLine(n.Count);
                 return Ok(_mapper.Map<IEnumerable<NarudzbaDTORead>>(n));
             }
             catch (Exception ex)

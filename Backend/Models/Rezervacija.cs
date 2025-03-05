@@ -6,11 +6,11 @@ namespace Backend.Models
     {
         
         
-        [ForeignKey("Gost")]
-        public int Gost { get; set; } // Vanjski ključ
+        [ForeignKey("gost")]
+        public required Gost Gost { get; set; } // Vanjski ključ
         
-        [ForeignKey("Stol")]
-        public int Stol { get; set; } // Vanjski ključ
+        [ForeignKey("stol")]
+        public required Stol Stol { get; set; } // Vanjski ključ
         
         [Column("datum_vrijeme")]
         public DateTime DatumVrijeme { get; set; }
@@ -19,8 +19,7 @@ namespace Backend.Models
         public int BrojOsoba { get; set; }
         public string? Napomena { get; set; } = "";
 
-        public required ICollection<Narudzba> Narudzbe { get; set; }
-
+ 
         
     }
 }
