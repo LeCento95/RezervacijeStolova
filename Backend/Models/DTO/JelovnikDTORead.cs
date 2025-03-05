@@ -2,11 +2,11 @@
 {
 
     /// <summary>
-    /// DTO za čitanje jelovnika.
+    /// DTO za čitanje podataka o jelovniku.
     /// </summary>
-    /// <param name="Sifra">Jedinstvena šifra jelovnika.</param>
+    /// <param name="Sifra">Jedinstveni identifikator jela.</param>
     /// <param name="NazivJela">Naziv jela.</param>
-    /// <param name="Kategorija">Predjelo, glavno jelo, desert.</param>
+    /// <param name="Kategorija">Kategorija jela.</param>
     /// <param name="Cijena">Cijena jela.</param>
     public record JelovnikDTORead(
         int Sifra,

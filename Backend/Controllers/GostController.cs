@@ -3,13 +3,13 @@ using Backend.Data;
 using Backend.Models;
 using Backend.Models.DTO;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 
 
 namespace Backend.Controllers
 {
-
     /// <summary>
-    /// Kontroler za upravljanje gostima u aplikaciji .
+    /// Kontroler za upravljanje gostima u aplikaciji.
     /// </summary>
     /// <param name="context">Kontekst baze podataka.</param>
     /// <param name="mapper">Mapper za mapiranje objekata.</param>
@@ -17,171 +17,162 @@ namespace Backend.Controllers
     [Route("api/v1/[controller]")]
     public class GostController(BackendContext context, IMapper mapper) : BackendController(context, mapper)
     {
-
+        /// <summary>
+        /// Dohvaća sve goste.
+        /// </summary>
+        /// <returns>Lista DTO-ova gostiju.</returns>
         [HttpGet]
-        public ActionResult<List<GostDTORead>> Get()
+        [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(IEnumerable<GostDTORead>))]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        public async Task<ActionResult<IEnumerable<GostDTORead>>> Get()
         {
-            if (!ModelState.IsValid)
-            {
-                return BadRequest(new { poruka = ModelState });
-            }
             try
             {
-                return Ok(_mapper.Map<List<GostDTORead>>(_context.Gosti));
+                var g = await _context.Gosti.ToListAsync();
+                return Ok(_mapper.Map<IEnumerable<GostDTORead>>(g));
             }
             catch (Exception ex)
             {
                 return BadRequest(new { poruka = ex.Message });
             }
-
         }
 
         /// <summary>
-        /// Dohvaća goste prema šifri.
+        /// Dohvaća gosta prema šifri.
         /// </summary>
         /// <param name="sifra">Šifra gosta.</param>
-        /// <returns>Gost.</returns>
-        [HttpGet]
-        [Route("{sifra:int}")]
-        public ActionResult<GostDTORead> GetBySifra(int sifra)
+        /// <returns>DTO gosta.</returns>
+        [HttpGet("{sifra:int}")]
+        [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(GostDTORead))]
+        [ProducesResponseType(StatusCodes.Status404NotFound)]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        public async Task<ActionResult<GostDTORead>> Get(int sifra)
         {
-            if (!ModelState.IsValid)
-            {
-                return BadRequest(new { poruka = ModelState });
-            }
-            Gost? e;
             try
             {
-                e = _context.Gosti.Find(sifra);
+                var g = await _context.Gosti.FindAsync(sifra);
+
+                if (g == null)
+                {
+                    return NotFound(new { poruka = $"Gost sa šifrom {sifra} ne postoji." });
+                }
+
+                return Ok(_mapper.Map<GostDTORead>(g));
             }
             catch (Exception ex)
             {
                 return BadRequest(new { poruka = ex.Message });
             }
-            if (e == null)
-            {
-                return NotFound(new { poruka = "Gost ne postoji u bazi" });
-            }
-
-            return Ok(_mapper.Map<GostDTORead>(e));
         }
-
 
         /// <summary>
         /// Dodaje novog gosta u bazu podataka.
         /// </summary>
-        /// <param name="dto">Podaci o gostu</param>
-        /// <returns>Status kreiranja.</returns>
+        /// <param name="dto">Podaci o gostu.</param>
+        /// <returns>DTO kreiranog gosta.</returns>
         [HttpPost]
-        public IActionResult Post(GostDTOInsertUpdate dto)
+        [ProducesResponseType(StatusCodes.Status201Created, Type = typeof(GostDTORead))]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        public async Task<ActionResult<GostDTORead>> Post(GostDTOInsertUpdate dto)
         {
             if (!ModelState.IsValid)
             {
                 return BadRequest(new { poruka = ModelState });
             }
+
             try
             {
-                var e = _mapper.Map<Gost>(dto);
-                _context.Gosti.Add(e);
-                _context.SaveChanges();
-                return StatusCode(StatusCodes.Status201Created, _mapper.Map<GostDTORead>(e));
+                var g = _mapper.Map<Gost>(dto);
+                _context.Gosti.Add(g);
+                await _context.SaveChangesAsync();
+
+                return CreatedAtAction(nameof(Get), new { sifra = g.Sifra }, _mapper.Map<GostDTORead>(g));
             }
             catch (Exception ex)
             {
                 return BadRequest(new { poruka = ex.Message });
             }
-
-
-
         }
-
 
         /// <summary>
         /// Ažurira gosta prema šifri.
         /// </summary>
-        /// <param name="sifra">šifra gosta.</param>
+        /// <param name="sifra">Šifra gosta.</param>
         /// <param name="dto">Podaci o gostu.</param>
         /// <returns>Status ažuriranja.</returns>
-        [HttpPut]
-        [Route("{sifra:int}")]
-        [Produces("application/json")]
-        public IActionResult Put(int sifra, GostDTOInsertUpdate dto)
+        [HttpPut("{sifra:int}")]
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status404NotFound)]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        public async Task<IActionResult> Put(int sifra, GostDTOInsertUpdate dto)
         {
             if (!ModelState.IsValid)
             {
                 return BadRequest(new { poruka = ModelState });
             }
+
             try
             {
-                Gost? e;
-                try
-                {
-                    e = _context.Gosti.Find(sifra);
-                }
-                catch (Exception ex)
-                {
-                    return BadRequest(new { poruka = ex.Message });
-                }
-                if (e == null)
-                {
-                    return NotFound(new { poruka = "Gost ne postoji u bazi" });
-                }
-                e = _mapper.Map(dto, e);
+                var g = await _context.Gosti.FindAsync(sifra);
 
-                _context.Gosti.Update(e);
-                _context.SaveChanges();
+                if (g == null)
+                {
+                    return NotFound(new { poruka = $"Gost sa šifrom {sifra} ne postoji." });
+                }
 
-                return Ok(new { poruka = "Uspješno promijenjeno" });
+                _mapper.Map(dto, g);
+                _context.Entry(g).State = EntityState.Modified;
+
+                await _context.SaveChangesAsync();
+
+                return Ok(new { poruka = "Gost uspješno ažuriran." });
+            }
+            catch (DbUpdateConcurrencyException)
+            {
+                if (!await _context.Gosti.AnyAsync(g => g.Sifra == sifra))
+                {
+                    return NotFound(new { poruka = $"Gost sa šifrom {sifra} ne postoji." });
+                }
+                else
+                {
+                    return StatusCode(StatusCodes.Status500InternalServerError, new { poruka = "Došlo je do greške prilikom ažuriranja." });
+                }
             }
             catch (Exception ex)
             {
                 return BadRequest(new { poruka = ex.Message });
             }
-
         }
 
-
         /// <summary>
-        /// 
+        /// Briše gosta prema šifri.
         /// </summary>
         /// <param name="sifra">Šifra gosta.</param>
         /// <returns>Status brisanja.</returns>
-        [HttpDelete]
-        [Route("{sifra:int}")]
-        [Produces("application/json")]
-        public IActionResult Delete(int sifra)
+        [HttpDelete("{sifra:int}")]
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status404NotFound)]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        public async Task<IActionResult> Delete(int sifra)
         {
-            if (!ModelState.IsValid)
-            {
-                return BadRequest(new { poruka = ModelState });
-            }
             try
             {
-                Gost? e;
-                try
+                var g = await _context.Gosti.FindAsync(sifra);
+
+                if (g == null)
                 {
-                    e = _context.Gosti.Find(sifra);
+                    return NotFound(new { poruka = $"Gost sa šifrom {sifra} ne postoji." });
                 }
-                catch (Exception ex)
-                {
-                    return BadRequest(new { poruka = ex.Message });
-                }
-                if (e == null)
-                {
-                    return NotFound("Gost ne postoji u bazi");
-                }
-                _context.Gosti.Remove(e);
-                _context.SaveChanges();
-                return Ok(new { poruka = "Uspješno obrisano" });
+
+                _context.Gosti.Remove(g);
+                await _context.SaveChangesAsync();
+
+                return Ok(new { poruka = "Gost uspješno obrisan." });
             }
             catch (Exception ex)
             {
                 return BadRequest(new { poruka = ex.Message });
             }
         }
-
-        
-
-
     }
 }

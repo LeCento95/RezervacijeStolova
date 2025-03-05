@@ -7,7 +7,8 @@ namespace Backend.Models
         [Column("broj_stola")]
         public int BrojStola { get; set; }
         public int Kapacitet { get; set; }
-        public string? lokacija { get; set; } = "";
-        public ICollection<Rezervacija> Rezervacije { get; set; } = new List<Rezervacija>();
+        [Column("lokacija")]
+        public string? Lokacija { get; set; } = "";
+        
     }
 }

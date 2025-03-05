@@ -3,6 +3,7 @@ using Backend.Data;
 using Backend.Models;
 using Backend.Models.DTO;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 
 namespace Backend.Controllers
 {
@@ -15,16 +16,19 @@ namespace Backend.Controllers
     [Route("api/v1/[controller]")]
     public class RezervacijaController(BackendContext context, IMapper mapper) : BackendController(context, mapper)
     {
+        /// <summary>
+        /// Dohvaća sve rezervacije.
+        /// </summary>
+        /// <returns>Lista DTO-ova rezervacija.</returns>
         [HttpGet]
-        public ActionResult<List<RezervacijaDTORead>> Get()
+        [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(IEnumerable<RezervacijaDTORead>))]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        public async Task<ActionResult<IEnumerable<RezervacijaDTORead>>> Get()
         {
-            if (!ModelState.IsValid)
-            {
-                return BadRequest(new { poruka = ModelState });
-            }
             try
             {
-                return Ok(_mapper.Map<List<RezervacijaDTORead>>(_context.Rezervacije));
+                var r = await _context.Rezervacije.ToListAsync();
+                return Ok(_mapper.Map<IEnumerable<RezervacijaDTORead>>(r));
             }
             catch (Exception ex)
             {
@@ -36,50 +40,52 @@ namespace Backend.Controllers
         /// Dohvaća rezervaciju prema šifri.
         /// </summary>
         /// <param name="sifra">Šifra rezervacije.</param>
-        /// <returns>Rezervacija.</returns>
-        [HttpGet]
-        [Route("{sifra:int}")]
-        public ActionResult<RezervacijaDTORead> GetBySifra(int sifra)
+        /// <returns>DTO rezervacije.</returns>
+        [HttpGet("{sifra:int}")]
+        [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(RezervacijaDTORead))]
+        [ProducesResponseType(StatusCodes.Status404NotFound)]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        public async Task<ActionResult<RezervacijaDTORead>> Get(int sifra)
         {
-            if (!ModelState.IsValid)
-            {
-                return BadRequest(new { poruka = ModelState });
-            }
-            Rezervacija? e;
             try
             {
-                e = _context.Rezervacije.Find(sifra);
+                var r = await _context.Rezervacije.FindAsync(sifra);
+
+                if (r == null)
+                {
+                    return NotFound(new { poruka = $"Rezervacija sa šifrom {sifra} ne postoji." });
+                }
+
+                return Ok(_mapper.Map<RezervacijaDTORead>(r));
             }
             catch (Exception ex)
             {
                 return BadRequest(new { poruka = ex.Message });
             }
-            if (e == null)
-            {
-                return NotFound(new { poruka = "Rezervacija ne postoji u bazi" });
-            }
-
-            return Ok(_mapper.Map<RezervacijaDTORead>(e));
         }
 
         /// <summary>
         /// Dodaje novu rezervaciju u bazu podataka.
         /// </summary>
         /// <param name="dto">Podaci o rezervaciji.</param>
-        /// <returns>Status kreiranja.</returns>
+        /// <returns>DTO kreirane rezervacije.</returns>
         [HttpPost]
-        public IActionResult Post(RezervacijaDTOInsertUpdate dto)
+        [ProducesResponseType(StatusCodes.Status201Created, Type = typeof(RezervacijaDTORead))]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        public async Task<ActionResult<RezervacijaDTORead>> Post(RezervacijaDTOInsertUpdate dto)
         {
             if (!ModelState.IsValid)
             {
                 return BadRequest(new { poruka = ModelState });
             }
+
             try
             {
-                var e = _mapper.Map<Rezervacija>(dto);
-                _context.Rezervacije.Add(e);
-                _context.SaveChanges();
-                return StatusCode(StatusCodes.Status201Created, _mapper.Map<RezervacijaDTORead>(e));
+                var r = _mapper.Map<Rezervacija>(dto);
+                _context.Rezervacije.Add(r);
+                await _context.SaveChangesAsync();
+
+                return CreatedAtAction(nameof(Get), new { sifra = r.Sifra }, _mapper.Map<RezervacijaDTORead>(r));
             }
             catch (Exception ex)
             {
@@ -93,36 +99,43 @@ namespace Backend.Controllers
         /// <param name="sifra">Šifra rezervacije.</param>
         /// <param name="dto">Podaci o rezervaciji.</param>
         /// <returns>Status ažuriranja.</returns>
-        [HttpPut]
-        [Route("{sifra:int}")]
-        [Produces("application/json")]
-        public IActionResult Put(int sifra, RezervacijaDTOInsertUpdate dto)
+        [HttpPut("{sifra:int}")]
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status404NotFound)]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        public async Task<IActionResult> Put(int sifra, RezervacijaDTOInsertUpdate dto)
         {
             if (!ModelState.IsValid)
             {
                 return BadRequest(new { poruka = ModelState });
             }
+
             try
             {
-                Rezervacija? e;
-                try
-                {
-                    e = _context.Rezervacije.Find(sifra);
-                }
-                catch (Exception ex)
-                {
-                    return BadRequest(new { poruka = ex.Message });
-                }
-                if (e == null)
-                {
-                    return NotFound(new { poruka = "Rezervacija ne postoji u bazi" });
-                }
-                e = _mapper.Map(dto, e);
+                var r = await _context.Rezervacije.FindAsync(sifra);
 
-                _context.Rezervacije.Update(e);
-                _context.SaveChanges();
+                if (r == null)
+                {
+                    return NotFound(new { poruka = $"Rezervacija sa šifrom {sifra} ne postoji." });
+                }
 
-                return Ok(new { poruka = "Uspješno promijenjeno" });
+                _mapper.Map(dto, r);
+                _context.Entry(r).State = EntityState.Modified;
+
+                await _context.SaveChangesAsync();
+
+                return Ok(new { poruka = "Rezervacija uspješno ažurirana." });
+            }
+            catch (DbUpdateConcurrencyException)
+            {
+                if (!await _context.Rezervacije.AnyAsync(r => r.Sifra == sifra))
+                {
+                    return NotFound(new { poruka = $"Rezervacija sa šifrom {sifra} ne postoji." });
+                }
+                else
+                {
+                    return StatusCode(StatusCodes.Status500InternalServerError, new { poruka = "Došlo je do greške prilikom ažuriranja." });
+                }
             }
             catch (Exception ex)
             {
@@ -135,33 +148,25 @@ namespace Backend.Controllers
         /// </summary>
         /// <param name="sifra">Šifra rezervacije.</param>
         /// <returns>Status brisanja.</returns>
-        [HttpDelete]
-        [Route("{sifra:int}")]
-        [Produces("application/json")]
-        public IActionResult Delete(int sifra)
+        [HttpDelete("{sifra:int}")]
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status404NotFound)]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        public async Task<IActionResult> Delete(int sifra)
         {
-            if (!ModelState.IsValid)
-            {
-                return BadRequest(new { poruka = ModelState });
-            }
             try
             {
-                Rezervacija? e;
-                try
+                var r = await _context.Rezervacije.FindAsync(sifra);
+
+                if (r == null)
                 {
-                    e = _context.Rezervacije.Find(sifra);
+                    return NotFound(new { poruka = $"Rezervacija sa šifrom {sifra} ne postoji." });
                 }
-                catch (Exception ex)
-                {
-                    return BadRequest(new { poruka = ex.Message });
-                }
-                if (e == null)
-                {
-                    return NotFound("Rezervacija ne postoji u bazi");
-                }
-                _context.Rezervacije.Remove(e);
-                _context.SaveChanges();
-                return Ok(new { poruka = "Uspješno obrisano" });
+
+                _context.Rezervacije.Remove(r);
+                await _context.SaveChangesAsync();
+
+                return Ok(new { poruka = "Rezervacija uspješno obrisana." });
             }
             catch (Exception ex)
             {

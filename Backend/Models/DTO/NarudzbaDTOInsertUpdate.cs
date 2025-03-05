@@ -5,21 +5,21 @@ namespace Backend.Models.DTO
 {
 
     /// <summary>
-    /// DTO za unos i ažuriranje narudžbi.
+    /// DTO za unos i ažuriranje podataka o narudžbi.
     /// </summary>
-    /// <param name="Rezervacija">Rezervacija je obavezna.</param>
-    /// <param name="Jelo">Jelo je obavezno.</param>
-    /// <param name="Kolicina">Količina je obavezna.</param>
+    /// <param name="Rezervacija">Identifikator rezervacije (obavezno).</param>
+    /// <param name="Jelo">Identifikator jela (obavezno).</param>
+    /// <param name="Kolicina">Količina naručenog jela (obavezno, veća od 0).</param>
     public record NarudzbaDTOInsertUpdate(
 
-        [Required(ErrorMessage = "Rezuervacija je obavezna" )]
-        int Rezervacija,
-
-        [Required(ErrorMessage = "Jelo je obavezno")]
-        int Jelo,
-
-        [Required(ErrorMessage = "Kolicina je obavezna")]
-        int Kolicina
+     [Required(ErrorMessage = "Rezervacija je obavezna.")] 
+     int Rezervacija,
+     
+     [Required(ErrorMessage = "Jelo je obavezno.")] 
+     int Jelo,
+     
+     [Required(ErrorMessage = "Količina je obavezna.")][Range(1, int.MaxValue, ErrorMessage = "Količina mora biti veća od 0.")] 
+     int Kolicina
 
 
     );

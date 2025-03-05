@@ -2,7 +2,7 @@
 using Backend.Mapping;
 using Microsoft.EntityFrameworkCore;
 
-// Dobro dodatno �itanje
+// Dobro dodatno čitanje
 // 1. https://medium.com/@robhutton8/entity-framework-vs-repository-pattern-vs-unit-of-work-9fa093bd59e4
 // 2. https://www.thereformedprogrammer.net/is-the-repository-pattern-useful-with-entity-framework-core/
 // 3. https://medium.com/@rabinarayandev/should-you-use-uuids-for-database-keys-597b15b000bb
@@ -26,7 +26,7 @@ builder.Services.AddDbContext<BackendContext>(options => {
 
 
 // Svi se od svuda na sve moguce nacine mogu spojitina na� API
-// �itati https://code-maze.com/aspnetcore-webapi-best-practices/
+// Čitati https://code-maze.com/aspnetcore-webapi-best-practices/
 //  https://levelup.gitconnected.com/cors-finally-explained-simply-ae42b52a70a3
 builder.Services.AddCors(o => {
 

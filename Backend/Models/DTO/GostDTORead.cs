@@ -1,5 +1,6 @@
 ﻿namespace Backend.Models.DTO
 {
+
     /// <summary>
     /// DTO za čitanje podataka o gostu.
     /// </summary>
@@ -7,17 +8,17 @@
     /// <param name="Ime">Ime gosta.</param>
     /// <param name="Prezime">Prezime gosta.</param>
     /// <param name="BrojTelefona">Broj telefona gosta.</param>
-    /// <param name="Email">Email gosta.</param>
+    /// <param name="Email">E-mail adresa gosta.</param>
     public record GostDTORead(
+
         int Sifra,
 
-        string Ime,
+        string? Ime,
 
-        string Prezime,
+        string? Prezime,
 
-        string BrojTelefona,
+        string? BrojTelefona,
 
-        string Email
-        );
-    
+        string? Email
+     );
 }

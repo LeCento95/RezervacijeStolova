@@ -2,9 +2,9 @@
 
 namespace Backend.Models
 {
-    public class Narudzba
+    public class Narudzba : Entitet
     {
-        public int Sifra { get; set; }
+        
 
         [ForeignKey("Rezervacija")]
         public int Rezervacija { get; set; }
@@ -14,8 +14,6 @@ namespace Backend.Models
 
         public int Kolicina { get; set; }
 
-        // Navigacijska svojstva
-        public Rezervacija RezervacijaNavigation { get; set; }
-        public Jelovnik JeloNavigation { get; set; }
+
     }
 }

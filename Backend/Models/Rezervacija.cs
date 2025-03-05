@@ -2,9 +2,9 @@
 
 namespace Backend.Models
 {
-    public class Rezervacija
+    public class Rezervacija : Entitet
     {
-        public int Sifra { get; set; }
+        
         
         [ForeignKey("Gost")]
         public int Gost { get; set; } // Vanjski ključ
@@ -19,9 +19,8 @@ namespace Backend.Models
         public int BrojOsoba { get; set; }
         public string? Napomena { get; set; } = "";
 
-        // Navigacijska svojstva
-        public Gost GostNavigation { get; set; }
-        public Stol StolNavigation { get; set; }
-        public ICollection<Narudzba> Narudzbe { get; set; } = new List<Narudzba>();
+        public required ICollection<Narudzba> Narudzbe { get; set; }
+
+        
     }
 }

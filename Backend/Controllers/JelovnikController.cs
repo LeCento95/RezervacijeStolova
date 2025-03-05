@@ -3,6 +3,8 @@ using Backend.Data;
 using Backend.Models;
 using Backend.Models.DTO;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
+
 
 namespace Backend.Controllers
 {
@@ -15,16 +17,19 @@ namespace Backend.Controllers
     [Route("api/v1/[controller]")]
     public class JelovnikController(BackendContext context, IMapper mapper) : BackendController(context, mapper)
     {
+        /// <summary>
+        /// Dohvaća sve stavke jelovnika.
+        /// </summary>
+        /// <returns>Lista DTO-ova stavki jelovnika.</returns>
         [HttpGet]
-        public ActionResult<List<JelovnikDTORead>> Get()
+        [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(IEnumerable<JelovnikDTORead>))]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        public async Task<ActionResult<IEnumerable<JelovnikDTORead>>> Get()
         {
-            if (!ModelState.IsValid)
-            {
-                return BadRequest(new { poruka = ModelState });
-            }
             try
             {
-                return Ok(_mapper.Map<List<JelovnikDTORead>>(_context.Jelovnik));
+                var j = await _context.Jelovnik.ToListAsync();
+                return Ok(_mapper.Map<IEnumerable<JelovnikDTORead>>(j));
             }
             catch (Exception ex)
             {
@@ -33,53 +38,55 @@ namespace Backend.Controllers
         }
 
         /// <summary>
-        /// Dohvaća jelo iz jelovnika prema šifri.
+        /// Dohvaća stavku jelovnika prema šifri.
         /// </summary>
-        /// <param name="sifra">Šifra jela.</param>
-        /// <returns>Jelo iz jelovnika.</returns>
-        [HttpGet]
-        [Route("{sifra:int}")]
-        public ActionResult<JelovnikDTORead> GetBySifra(int sifra)
+        /// <param name="sifra">Šifra stavke jelovnika.</param>
+        /// <returns>DTO stavke jelovnika.</returns>
+        [HttpGet("{sifra:int}")]
+        [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(JelovnikDTORead))]
+        [ProducesResponseType(StatusCodes.Status404NotFound)]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        public async Task<ActionResult<JelovnikDTORead>> Get(int sifra)
         {
-            if (!ModelState.IsValid)
-            {
-                return BadRequest(new { poruka = ModelState });
-            }
-            Jelovnik? e;
             try
             {
-                e = _context.Jelovnik.Find(sifra);
+                var j = await _context.Jelovnik.FindAsync(sifra);
+
+                if (j == null)
+                {
+                    return NotFound(new { poruka = $"Stavka jelovnika sa šifrom {sifra} ne postoji." });
+                }
+
+                return Ok(_mapper.Map<JelovnikDTORead>(j));
             }
             catch (Exception ex)
             {
                 return BadRequest(new { poruka = ex.Message });
             }
-            if (e == null)
-            {
-                return NotFound(new { poruka = "Jelo ne postoji u jelovniku" });
-            }
-
-            return Ok(_mapper.Map<JelovnikDTORead>(e));
         }
 
         /// <summary>
-        /// Dodaje novo jelo u jelovnik.
+        /// Dodaje novu stavku jelovnika u bazu podataka.
         /// </summary>
-        /// <param name="dto">Podaci o jelu.</param>
-        /// <returns>Status kreiranja.</returns>
+        /// <param name="dto">Podaci o stavci jelovnika.</param>
+        /// <returns>DTO kreirane stavke jelovnika.</returns>
         [HttpPost]
-        public IActionResult Post(JelovnikDTOInsertUpdate dto)
+        [ProducesResponseType(StatusCodes.Status201Created, Type = typeof(JelovnikDTORead))]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        public async Task<ActionResult<JelovnikDTORead>> Post(JelovnikDTOInsertUpdate dto)
         {
             if (!ModelState.IsValid)
             {
                 return BadRequest(new { poruka = ModelState });
             }
+
             try
             {
-                var e = _mapper.Map<Jelovnik>(dto);
-                _context.Jelovnik.Add(e);
-                _context.SaveChanges();
-                return StatusCode(StatusCodes.Status201Created, _mapper.Map<JelovnikDTORead>(e));
+                var j = _mapper.Map<Jelovnik>(dto);
+                _context.Jelovnik.Add(j);
+                await _context.SaveChangesAsync();
+
+                return CreatedAtAction(nameof(Get), new { sifra = j.Sifra }, _mapper.Map<JelovnikDTORead>(j));
             }
             catch (Exception ex)
             {
@@ -88,41 +95,48 @@ namespace Backend.Controllers
         }
 
         /// <summary>
-        /// Ažurira jelo u jelovniku prema šifri.
+        /// Ažurira stavku jelovnika prema šifri.
         /// </summary>
-        /// <param name="sifra">Šifra jela.</param>
-        /// <param name="dto">Podaci o jelu.</param>
+        /// <param name="sifra">Šifra stavke jelovnika.</param>
+        /// <param name="dto">Podaci o stavci jelovnika.</param>
         /// <returns>Status ažuriranja.</returns>
-        [HttpPut]
-        [Route("{sifra:int}")]
-        [Produces("application/json")]
-        public IActionResult Put(int sifra, JelovnikDTOInsertUpdate dto)
+        [HttpPut("{sifra:int}")]
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status404NotFound)]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        public async Task<IActionResult> Put(int sifra, JelovnikDTOInsertUpdate dto)
         {
             if (!ModelState.IsValid)
             {
                 return BadRequest(new { poruka = ModelState });
             }
+
             try
             {
-                Jelovnik? e;
-                try
-                {
-                    e = _context.Jelovnik.Find(sifra);
-                }
-                catch (Exception ex)
-                {
-                    return BadRequest(new { poruka = ex.Message });
-                }
-                if (e == null)
-                {
-                    return NotFound(new { poruka = "Jelo ne postoji u jelovniku" });
-                }
-                e = _mapper.Map(dto, e);
+                var j = await _context.Jelovnik.FindAsync(sifra);
 
-                _context.Jelovnik.Update(e);
-                _context.SaveChanges();
+                if (j == null)
+                {
+                    return NotFound(new { poruka = $"Stavka jelovnika sa šifrom {sifra} ne postoji." });
+                }
 
-                return Ok(new { poruka = "Uspješno promijenjeno" });
+                _mapper.Map(dto, j);
+                _context.Entry(j).State = EntityState.Modified;
+
+                await _context.SaveChangesAsync();
+
+                return Ok(new { poruka = "Stavka jelovnika uspješno ažurirana." });
+            }
+            catch (DbUpdateConcurrencyException)
+            {
+                if (!await _context.Jelovnik.AnyAsync(j => j.Sifra == sifra))
+                {
+                    return NotFound(new { poruka = $"Stavka jelovnika sa šifrom {sifra} ne postoji." });
+                }
+                else
+                {
+                    return StatusCode(StatusCodes.Status500InternalServerError, new { poruka = "Došlo je do greške prilikom ažuriranja." });
+                }
             }
             catch (Exception ex)
             {
@@ -131,37 +145,29 @@ namespace Backend.Controllers
         }
 
         /// <summary>
-        /// Briše jelo iz jelovnika prema šifri.
+        /// Briše stavku jelovnika prema šifri.
         /// </summary>
-        /// <param name="sifra">Šifra jela.</param>
+        /// <param name="sifra">Šifra stavke jelovnika.</param>
         /// <returns>Status brisanja.</returns>
-        [HttpDelete]
-        [Route("{sifra:int}")]
-        [Produces("application/json")]
-        public IActionResult Delete(int sifra)
+        [HttpDelete("{sifra:int}")]
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status404NotFound)]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        public async Task<IActionResult> Delete(int sifra)
         {
-            if (!ModelState.IsValid)
-            {
-                return BadRequest(new { poruka = ModelState });
-            }
             try
             {
-                Jelovnik? e;
-                try
+                var j = await _context.Jelovnik.FindAsync(sifra);
+
+                if (j == null)
                 {
-                    e = _context.Jelovnik.Find(sifra);
+                    return NotFound(new { poruka = $"Stavka jelovnika sa šifrom {sifra} ne postoji." });
                 }
-                catch (Exception ex)
-                {
-                    return BadRequest(new { poruka = ex.Message });
-                }
-                if (e == null)
-                {
-                    return NotFound("Jelo ne postoji u jelovniku");
-                }
-                _context.Jelovnik.Remove(e);
-                _context.SaveChanges();
-                return Ok(new { poruka = "Uspješno obrisano" });
+
+                _context.Jelovnik.Remove(j);
+                await _context.SaveChangesAsync();
+
+                return Ok(new { poruka = "Stavka jelovnika uspješno obrisana." });
             }
             catch (Exception ex)
             {
