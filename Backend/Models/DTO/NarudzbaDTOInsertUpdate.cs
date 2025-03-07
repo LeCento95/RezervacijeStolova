@@ -14,7 +14,9 @@ namespace Backend.Models.DTO
 
      [Required(ErrorMessage = "Rezervacija je obavezna.")] 
      int RezervacijaSifra,
-    
+
+     [Required(ErrorMessage = "Jelo je obavezno")]
+     int JeloSifra,
      
      [Required(ErrorMessage = "Količina je obavezna.")][Range(1, int.MaxValue, ErrorMessage = "Količina mora biti veća od 0.")] 
      int Kolicina

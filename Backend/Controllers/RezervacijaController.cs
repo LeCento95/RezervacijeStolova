@@ -81,7 +81,31 @@ namespace Backend.Controllers
 
             try
             {
+                var g = await _context.Gosti.FindAsync(dto.Gost);
+                if (g == null)
+                {
+                    return BadRequest(new { poruka = $"Gost sa šifrom {dto.Gost} ne postoji." });
+                }
+
+                var s = await _context.Stolovi.FindAsync(dto.Stol);
+                if (s == null)
+                {
+                    return BadRequest(new { poruka = $"Stol sa šifrom {dto.Stol} ne postoji." });
+                }
+
+                // Provjera dupliciranja rezervacije
+                var postojecaRezervacija = await _context.Rezervacije
+                    .AnyAsync(r => r.Stol.Sifra == dto.Stol && r.DatumVrijeme == dto.DatumVrijeme);
+
+                if (postojecaRezervacija)
+                {
+                    return BadRequest(new { poruka = $"Rezervacija za stol {dto.Stol} i vrijeme {dto.DatumVrijeme} već postoji." });
+                }
+
                 var r = _mapper.Map<Rezervacija>(dto);
+                r.Gost = g;
+                r.Stol = s;
+
                 _context.Rezervacije.Add(r);
                 await _context.SaveChangesAsync();
 
@@ -119,7 +143,31 @@ namespace Backend.Controllers
                     return NotFound(new { poruka = $"Rezervacija sa šifrom {sifra} ne postoji." });
                 }
 
+                var g = await _context.Gosti.FindAsync(dto.Gost);
+                if (g == null)
+                {
+                    return BadRequest(new { poruka = $"Gost sa šifrom {dto.Gost} ne postoji." });
+                }
+
+                var s = await _context.Stolovi.FindAsync(dto.Stol);
+                if (s == null)
+                {
+                    return BadRequest(new { poruka = $"Stol sa šifrom {dto.Stol} ne postoji." });
+                }
+
+                // Provjera dupliciranja rezervacije (osim za trenutnu rezervaciju)
+                var postojecaRezervacija = await _context.Rezervacije
+                    .AnyAsync(rez => rez.Stol.Sifra == dto.Stol && rez.DatumVrijeme == dto.DatumVrijeme && rez.Sifra != sifra);
+
+                if (postojecaRezervacija)
+                {
+                    return BadRequest(new { poruka = $"Rezervacija za stol {dto.Stol} i vrijeme {dto.DatumVrijeme} već postoji." });
+                }
+
                 _mapper.Map(dto, r);
+                r.Gost = g;
+                r.Stol = s;
+
                 _context.Entry(r).State = EntityState.Modified;
 
                 await _context.SaveChangesAsync();
@@ -128,7 +176,7 @@ namespace Backend.Controllers
             }
             catch (DbUpdateConcurrencyException)
             {
-                if (!await _context.Rezervacije.AnyAsync(r => r.Sifra == sifra))
+                if (!await _context.Rezervacije.AnyAsync(rez => rez.Sifra == sifra))
                 {
                     return NotFound(new { poruka = $"Rezervacija sa šifrom {sifra} ne postoji." });
                 }
@@ -139,7 +187,7 @@ namespace Backend.Controllers
             }
             catch (Exception ex)
             {
-                return BadRequest(new { poruka = ex.Message });
+                   return BadRequest(new { poruka = ex.Message });
             }
         }
 
