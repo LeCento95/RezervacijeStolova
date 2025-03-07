@@ -48,8 +48,12 @@ namespace Backend.Mapping
                    "JelovnikNaziv",
                    opt => opt.MapFrom(src => src.Jelovnik.NazivJela)
                );
-            
-           
+
+            CreateMap<NarudzbaDTOInsertUpdate, Narudzba>();
+            CreateMap<Narudzba, NarudzbaDTOInsertUpdate>();
+
+
+
 
 
 
