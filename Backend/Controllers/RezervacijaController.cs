@@ -23,12 +23,16 @@ namespace Backend.Controllers
         [HttpGet]
         [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(IEnumerable<RezervacijaDTORead>))]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
-        public async Task<ActionResult<IEnumerable<RezervacijaDTORead>>> Get()
+        public ActionResult<IEnumerable<RezervacijaDTORead>> Get()
         {
             try
             {
-                var r = await _context.Rezervacije.ToListAsync();
-                return Ok(_mapper.Map<IEnumerable<RezervacijaDTORead>>(r));
+                var rez = _context.Rezervacije
+                    .Include(r => r.Gost)
+                    .Include(r => r.Stol)
+                    .ToList();
+
+                return Ok(_mapper.Map<IEnumerable<RezervacijaDTORead>>(rez));
             }
             catch (Exception ex)
             {
@@ -49,14 +53,17 @@ namespace Backend.Controllers
         {
             try
             {
-                var r = await _context.Rezervacije.FindAsync(sifra);
+                var rez = await _context.Rezervacije
+                    .Include(r => r.Gost)
+                    .Include(r => r.Stol)
+                    .FirstOrDefaultAsync(r => r.Sifra == sifra);
 
-                if (r == null)
+                if (rez == null)
                 {
                     return NotFound(new { poruka = $"Rezervacija sa šifrom {sifra} ne postoji." });
                 }
 
-                return Ok(_mapper.Map<RezervacijaDTORead>(r));
+                return Ok(_mapper.Map<RezervacijaDTORead>(rez));
             }
             catch (Exception ex)
             {
@@ -79,37 +86,28 @@ namespace Backend.Controllers
                 return BadRequest(new { poruka = ModelState });
             }
 
+            var g = await _context.Gosti.FindAsync(dto.Gost);
+            if (g == null)
+            {
+                return BadRequest(new { poruka = $"Gost sa šifrom {dto.Gost} ne postoji." });
+            }
+
+            var s = await _context.Stolovi.FindAsync(dto.Stol);
+            if (s == null)
+            {
+                return BadRequest(new { poruka = $"Stol sa šifrom {dto.Stol} ne postoji." });
+            }
+
             try
             {
-                var g = await _context.Gosti.FindAsync(dto.Gost);
-                if (g == null)
-                {
-                    return BadRequest(new { poruka = $"Gost sa šifrom {dto.Gost} ne postoji." });
-                }
+                var rez = _mapper.Map<Rezervacija>(dto);
+                rez.Gost = g;
+                rez.Stol = s;
 
-                var s = await _context.Stolovi.FindAsync(dto.Stol);
-                if (s == null)
-                {
-                    return BadRequest(new { poruka = $"Stol sa šifrom {dto.Stol} ne postoji." });
-                }
-
-                // Provjera dupliciranja rezervacije
-                var postojecaRezervacija = await _context.Rezervacije
-                    .AnyAsync(r => r.Stol.Sifra == dto.Stol && r.DatumVrijeme == dto.DatumVrijeme);
-
-                if (postojecaRezervacija)
-                {
-                    return BadRequest(new { poruka = $"Rezervacija za stol {dto.Stol} i vrijeme {dto.DatumVrijeme} već postoji." });
-                }
-
-                var r = _mapper.Map<Rezervacija>(dto);
-                r.Gost = g;
-                r.Stol = s;
-
-                _context.Rezervacije.Add(r);
+                _context.Rezervacije.Add(rez);
                 await _context.SaveChangesAsync();
 
-                return CreatedAtAction(nameof(Get), new { sifra = r.Sifra }, _mapper.Map<RezervacijaDTORead>(r));
+                return CreatedAtAction(nameof(Get), new { sifra = rez.Sifra }, _mapper.Map<RezervacijaDTORead>(rez));
             }
             catch (Exception ex)
             {
@@ -136,9 +134,12 @@ namespace Backend.Controllers
 
             try
             {
-                var r = await _context.Rezervacije.FindAsync(sifra);
+                var rez = await _context.Rezervacije
+                    .Include(r => r.Gost)
+                    .Include(r => r.Stol)
+                    .FirstOrDefaultAsync(r => r.Sifra == sifra);
 
-                if (r == null)
+                if (rez == null)
                 {
                     return NotFound(new { poruka = $"Rezervacija sa šifrom {sifra} ne postoji." });
                 }
@@ -155,28 +156,18 @@ namespace Backend.Controllers
                     return BadRequest(new { poruka = $"Stol sa šifrom {dto.Stol} ne postoji." });
                 }
 
-                // Provjera dupliciranja rezervacije (osim za trenutnu rezervaciju)
-                var postojecaRezervacija = await _context.Rezervacije
-                    .AnyAsync(rez => rez.Stol.Sifra == dto.Stol && rez.DatumVrijeme == dto.DatumVrijeme && rez.Sifra != sifra);
+                _mapper.Map(dto, rez);
+                rez.Gost = g;
+                rez.Stol = s;
 
-                if (postojecaRezervacija)
-                {
-                    return BadRequest(new { poruka = $"Rezervacija za stol {dto.Stol} i vrijeme {dto.DatumVrijeme} već postoji." });
-                }
-
-                _mapper.Map(dto, r);
-                r.Gost = g;
-                r.Stol = s;
-
-                _context.Entry(r).State = EntityState.Modified;
-
+                _context.Entry(rez).State = EntityState.Modified;
                 await _context.SaveChangesAsync();
 
                 return Ok(new { poruka = "Rezervacija uspješno ažurirana." });
             }
             catch (DbUpdateConcurrencyException)
             {
-                if (!await _context.Rezervacije.AnyAsync(rez => rez.Sifra == sifra))
+                if (!await _context.Rezervacije.AnyAsync(r => r.Sifra == sifra))
                 {
                     return NotFound(new { poruka = $"Rezervacija sa šifrom {sifra} ne postoji." });
                 }
@@ -187,7 +178,7 @@ namespace Backend.Controllers
             }
             catch (Exception ex)
             {
-                   return BadRequest(new { poruka = ex.Message });
+                return BadRequest(new { poruka = ex.Message });
             }
         }
 
@@ -204,14 +195,14 @@ namespace Backend.Controllers
         {
             try
             {
-                var r = await _context.Rezervacije.FindAsync(sifra);
+                var rez = await _context.Rezervacije.FindAsync(sifra);
 
-                if (r == null)
+                if (rez == null)
                 {
                     return NotFound(new { poruka = $"Rezervacija sa šifrom {sifra} ne postoji." });
                 }
 
-                _context.Rezervacije.Remove(r);
+                _context.Rezervacije.Remove(rez);
                 await _context.SaveChangesAsync();
 
                 return Ok(new { poruka = "Rezervacija uspješno obrisana." });

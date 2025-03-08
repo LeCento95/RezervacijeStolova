@@ -83,15 +83,15 @@ namespace Backend.Controllers
                 return BadRequest(new { poruka = ModelState });
             }
 
-            var rezervacija = await _context.Rezervacije.Include(r=>r.Gost).FirstOrDefaultAsync(n=>n.Sifra == dto.RezervacijaSifra);
+            var r = await _context.Rezervacije.Include(r=>r.Gost).FirstOrDefaultAsync(n=>n.Sifra == dto.RezervacijaSifra);
 
-            if (rezervacija == null)
+            if (r == null)
             {
                 return BadRequest(new { poruka = $"Rezervacija sa šifrom {dto.RezervacijaSifra} ne postoji." });
             }
 
-            var jelo = await _context.Jelovnik.FindAsync(dto.JeloSifra);
-            if (jelo == null)
+            var j = await _context.Jelovnik.FindAsync(dto.JeloSifra);
+            if (j == null)
             {
                 return BadRequest(new { poruka = $"Jelo sa šifrom {dto.JeloSifra} ne postoji." });
             }
@@ -99,8 +99,8 @@ namespace Backend.Controllers
             try
             {
                 var n = _mapper.Map<Narudzba>(dto);
-                n.Rezervacija = rezervacija;
-                n.Jelovnik = jelo;
+                n.Rezervacija = r;
+                n.Jelovnik = j;
                 _context.Narudzbe.Add(n);
                 await _context.SaveChangesAsync();
 
