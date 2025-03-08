@@ -49,7 +49,7 @@ namespace Backend.Controllers
         [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(RezervacijaDTORead))]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
-        public async Task<ActionResult<RezervacijaDTORead>> Get(int sifra)
+        public async Task<ActionResult<RezervacijaDTOInsertUpdate>> Get(int sifra)
         {
             try
             {
@@ -63,7 +63,7 @@ namespace Backend.Controllers
                     return NotFound(new { poruka = $"Rezervacija sa šifrom {sifra} ne postoji." });
                 }
 
-                return Ok(_mapper.Map<RezervacijaDTORead>(rez));
+                return Ok(_mapper.Map<RezervacijaDTOInsertUpdate>(rez));
             }
             catch (Exception ex)
             {

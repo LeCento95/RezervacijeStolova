@@ -21,12 +21,9 @@ namespace Backend.Mapping
             
             // Mapiranje rezervacija
             CreateMap<Rezervacija, RezervacijaDTORead>()
-                .ForMember(dest => dest.Sifra, opt => opt.MapFrom(src => src.Sifra))
-                .ForMember(dest => dest.Gost, opt => opt.MapFrom(src => src.Gost.Sifra))
-                .ForMember(dest => dest.Stol, opt => opt.MapFrom(src => src.Stol.Sifra))
-                .ForMember(dest => dest.DatumVrijeme, opt => opt.MapFrom(src => src.DatumVrijeme))
-                .ForMember(dest => dest.BrojOsoba, opt => opt.MapFrom(src => src.BrojOsoba))
-                .ForMember(dest => dest.Napomena, opt => opt.MapFrom(src => src.Napomena));
+                .ForCtorParam("GostImePrezime", opt => opt.MapFrom(src => src.Gost.Ime + " " + src.Gost.Prezime))
+                .ForCtorParam("StolBroj", opt => opt.MapFrom(src => src.Stol.BrojStola));
+
             CreateMap<RezervacijaDTOInsertUpdate, Rezervacija>()
                 .ForMember(dest => dest.Gost, opt => opt.Ignore()) 
                 .ForMember(dest => dest.Stol, opt => opt.Ignore()) 

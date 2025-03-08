@@ -13,9 +13,9 @@
     public record RezervacijaDTORead(
         int Sifra,
 
-        int Gost,
+        string GostImePrezime,
 
-        int Stol,
+        string StolBroj,
 
         DateTime DatumVrijeme,
 
