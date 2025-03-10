@@ -187,9 +187,9 @@ namespace Backend.Controllers
 
         public ActionResult<List<GostDTORead>> TraziGosta(string uvjet)
         {
-            if (string.IsNullOrEmpty(uvjet) || uvjet.Length < 3)
+            if (uvjet == null || uvjet.Length < 3)
             {
-                return BadRequest(ModelState);
+                return BadRequest("Uvjet mora sadržavati barem 3 slova!");
             }
 
             uvjet = uvjet.ToLower();
@@ -200,8 +200,8 @@ namespace Backend.Controllers
 
                 var niz = uvjet.Split(" ");
 
-                foreach (var s in niz)
-                {
+                foreach (var s in uvjet.Split(" ")) {
+                
                     query = query.Where(g =>
                             g.Ime.Contains(s, StringComparison.OrdinalIgnoreCase) ||
                             g.Prezime.Contains(s, StringComparison.OrdinalIgnoreCase)
