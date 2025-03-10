@@ -174,5 +174,88 @@ namespace Backend.Controllers
                 return BadRequest(new { poruka = ex.Message });
             }
         }
+
+        /// <summary>
+        /// Traži gosta prema uvjetu.
+        /// </summary>
+        /// <param name="uvjet">Uvjet pretrage.</param>
+        /// <returns>Traženi gost.</returns>
+
+        [HttpGet]
+        [Route("traži/{uvjet}")]
+        [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(IEnumerable<GostDTORead>))]
+
+        public ActionResult<List<GostDTORead>> TraziGosta(string uvjet)
+        {
+            if (string.IsNullOrEmpty(uvjet) || uvjet.Length < 3)
+            {
+                return BadRequest(ModelState);
+            }
+
+            uvjet = uvjet.ToLower();
+
+            try
+            {
+                IEnumerable<Gost> query = _context.Gosti;
+
+                var niz = uvjet.Split(" ");
+
+                foreach (var s in niz)
+                {
+                    query = query.Where(g =>
+                            g.Ime.Contains(s, StringComparison.OrdinalIgnoreCase) ||
+                            g.Prezime.Contains(s, StringComparison.OrdinalIgnoreCase)
+                    );
+                }
+
+                var g = query.ToList();
+                return Ok(_mapper.Map<List<GostDTORead>>(g));
+            }
+            catch (Exception e)
+            {
+                return BadRequest(new { poruka = e.Message });
+            }
+
+        }
+
+        /*/// <summary>
+        /// Traži goste s paginacijom.
+        /// </summary>
+        /// <param name="stranica">Broj stranice.</param>
+        /// <param name="uvjet">Uvjet pretrage.</param>
+        /// <returns>Lista gosta.</returns>
+        [HttpGet]
+        [Route("traziStranicenje/{stranica}")]
+        [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(IEnumerable<GostDTORead>))]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        public IActionResult TraziGostaStranicenje(int stranica, string uvjet = "")
+        {
+            var poStranici = 7;
+            uvjet = uvjet.ToLower();
+
+            try
+            {
+                IEnumerable<Gost> query = _context.Gosti;
+
+                var niz = uvjet.Split(" ");
+
+                foreach (var s in niz)
+                {
+                    query = query.Where(g =>
+                        g.Ime.ToLower().Contains(s) ||
+                        g.Prezime.ToLower().Contains(s)
+                    );
+                }
+
+                query = query.OrderBy(g => g.Prezime).ThenBy(g => g.Ime);
+
+                var g = query.ToList();
+                return Ok(_mapper.Map<List<GostDTORead>>(g.Skip((poStranici * stranica) - poStranici).Take(poStranici)));
+            }
+            catch (Exception e)
+            {
+                return BadRequest(e.Message);
+            }
+        }*/
     }
 }
