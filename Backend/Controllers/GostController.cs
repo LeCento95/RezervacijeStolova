@@ -183,7 +183,7 @@ namespace Backend.Controllers
         /// <returns>Traženi gost.</returns>
 
         [HttpGet]
-        [Route("traži/{uvjet}")]
+        [Route("trazi/{uvjet}")]
         [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(IQueryable<GostDTORead>))]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
 
@@ -198,14 +198,13 @@ namespace Backend.Controllers
 
             try
             {
-                IQueryable<Gost> query = _context.Gosti; 
+                IQueryable<Gost> query = _context.Gosti;
 
-                foreach (var s in uvjet.Split(" "))
-                {
-                    query = query.Where(q => q.Ime.ToLower().Contains(s) || q.Prezime.ToLower().Contains(s));
-                }
+              
+                 query = query.Where(g => EF.Functions.Like(g.Prezime.ToLower(), $"%{uvjet}%") || EF.Functions.Like(g.Ime.ToLower(), $"%{uvjet}%"));
+                
 
-                var gosti = await query.ToListAsync(); 
+                var gosti = await query.ToListAsync();
 
                 return Ok(_mapper.Map<List<GostDTORead>>(gosti));
             }
