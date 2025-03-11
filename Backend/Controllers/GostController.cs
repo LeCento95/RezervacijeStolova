@@ -1,4 +1,5 @@
-﻿using AutoMapper;
+﻿using System.Linq.Expressions;
+using AutoMapper;
 using Backend.Data;
 using Backend.Models;
 using Backend.Models.DTO;
@@ -183,39 +184,35 @@ namespace Backend.Controllers
 
         [HttpGet]
         [Route("traži/{uvjet}")]
-        [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(IEnumerable<GostDTORead>))]
+        [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(IQueryable<GostDTORead>))]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
 
-        public ActionResult<List<GostDTORead>> TraziGosta(string uvjet)
+        public async Task<ActionResult<List<GostDTORead>>> TraziGostaAsync(string uvjet)
         {
-            if (uvjet == null || uvjet.Length < 3)
+            if (string.IsNullOrEmpty(uvjet) || uvjet.Length < 3)
             {
-                return BadRequest("Uvjet mora sadržavati barem 3 slova!");
+                return BadRequest(ModelState);
             }
 
             uvjet = uvjet.ToLower();
 
             try
             {
-                IEnumerable<Gost> query = _context.Gosti;
+                IQueryable<Gost> query = _context.Gosti; 
 
-                var niz = uvjet.Split(" ");
-
-                foreach (var s in uvjet.Split(" ")) {
-                
-                    query = query.Where(g =>
-                            g.Ime.Contains(s, StringComparison.OrdinalIgnoreCase) ||
-                            g.Prezime.Contains(s, StringComparison.OrdinalIgnoreCase)
-                    );
+                foreach (var s in uvjet.Split(" "))
+                {
+                    query = query.Where(q => q.Ime.ToLower().Contains(s) || q.Prezime.ToLower().Contains(s));
                 }
 
-                var g = query.ToList();
-                return Ok(_mapper.Map<List<GostDTORead>>(g));
+                var gosti = await query.ToListAsync(); 
+
+                return Ok(_mapper.Map<List<GostDTORead>>(gosti));
             }
             catch (Exception e)
             {
                 return BadRequest(new { poruka = e.Message });
             }
-
         }
 
         /*/// <summary>
@@ -228,34 +225,34 @@ namespace Backend.Controllers
         [Route("traziStranicenje/{stranica}")]
         [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(IEnumerable<GostDTORead>))]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
-        public IActionResult TraziGostaStranicenje(int stranica, string uvjet = "")
+        public async Task<IActionResult> TraziGostaStranicenje(int stranica, string uvjet = "")
+    {
+        var poStranici = 7;
+        uvjet = uvjet.ToLower();
+
+        try
         {
-            var poStranici = 7;
-            uvjet = uvjet.ToLower();
+            IQueryable<Gost> query = _context.Gosti;
 
-            try
+            var niz = uvjet.Split(" ");
+
+            foreach (var s in niz)
             {
-                IEnumerable<Gost> query = _context.Gosti;
-
-                var niz = uvjet.Split(" ");
-
-                foreach (var s in niz)
-                {
-                    query = query.Where(g =>
-                        g.Ime.ToLower().Contains(s) ||
-                        g.Prezime.ToLower().Contains(s)
-                    );
-                }
-
-                query = query.OrderBy(g => g.Prezime).ThenBy(g => g.Ime);
-
-                var g = query.ToList();
-                return Ok(_mapper.Map<List<GostDTORead>>(g.Skip((poStranici * stranica) - poStranici).Take(poStranici)));
+                query = query.Where(g =>
+                    g.Ime.ToLower().Contains(s) ||
+                    g.Prezime.ToLower().Contains(s)
+                );
             }
-            catch (Exception e)
-            {
-                return BadRequest(e.Message);
-            }
+
+            query = query.OrderBy(g => g.Prezime).ThenBy(g => g.Ime);
+
+            var g = await Task.Run(() => query.ToList()); // Use Task.Run to offload the query execution to a background thread.
+            return Ok(_mapper.Map<List<GostDTORead>>(g.Skip((poStranici * stranica) - poStranici).Take(poStranici)));
+        }
+        catch (Exception e)
+        {
+            return BadRequest(e.Message);
+        }
         }*/
     }
 }
