@@ -1,6 +1,7 @@
 import 'bootstrap/dist/css/bootstrap.min.css'
 import './App.css'
 import { Container } from 'react-bootstrap'
+import moment from 'moment'
 import NavBarRestorantReservation from './components/NavBarRestorantReservation'
 import { Route, Routes } from 'react-router-dom'
 import { RouteNames } from './constants'
