@@ -5,8 +5,14 @@ using Backend.Models.DTO;
 
 namespace Backend.Mapping
 {
+    /// <summary>
+    /// Klasa za definiranje mapiranja između modela i DTO objekata.
+    /// </summary>
     public class BackendMappingProfile:Profile
     {
+        /// <summary>
+        /// Konstruktor u kojem se definiraju mapiranja.
+        /// </summary>
         public BackendMappingProfile()
         {
             // Mapiranje gostiju
@@ -53,13 +59,25 @@ namespace Backend.Mapping
             CreateMap<NarudzbaDTOInsertUpdate, Narudzba>();
             CreateMap<Narudzba, NarudzbaDTOInsertUpdate>();
 
-
-
-
-
-
-
-
+            /*/// <summary>
+       /// Metoda za dobivanje putanje do slike jelovnika.
+       /// </summary>
+       /// <param name="e">Objekt jelovnika.</param>
+       /// <returns>Putanja do slike ili null ako slika ne postoji.</returns>
+       private static string? PutanjaDatoteke(Jelo e)
+       {
+           try
+           {
+               var ds = Path.DirectorySeparatorChar;
+               string slika = Path.Combine(Directory.GetCurrentDirectory()
+                   + ds + "wwwroot" + ds + "slike" + ds + "jela" + ds + e.Sifra + ".png");
+               return File.Exists(slika) ? "/slike/jela/" + e.Sifra + ".png" : null;
+           }
+           catch
+           {
+               return null;
+           }
+       }*/
         }
     }
 }

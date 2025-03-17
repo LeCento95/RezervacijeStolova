@@ -1,5 +1,6 @@
 ﻿using AutoMapper;
 using Backend.Data;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace Backend.Controllers
@@ -10,7 +11,8 @@ namespace Backend.Controllers
     /// <param name="context">Instanca BackendContext klase koja se koristi za pristup bazi podataka.</param>
     /// <param name="mapper">Instanca IMapper sučelja koja se koristi za mapiranje objekata.</param>
     [ApiController] 
-    [Route("api/[controller]")] 
+    [Route("api/[controller]")]
+    [Authorize]
     public abstract class BackendController(BackendContext context, IMapper mapper) : ControllerBase
     {
         /// <summary>
