@@ -1,4 +1,5 @@
 ﻿using System.Linq.Expressions;
+using System.Net;
 using AutoMapper;
 using Backend.Data;
 using Backend.Models;
@@ -212,6 +213,39 @@ namespace Backend.Controllers
             {
                 return BadRequest(new { poruka = e.Message });
             }
+        }
+
+        /// <summary>
+        /// Generira polaznike.
+        /// </summary>
+        /// <param name="broj">Broj gostiju za generiranje.</param>
+        /// <returns>Status generiranja.</returns>
+        [HttpGet]
+        [Route("Generiraj/{broj:int}")]
+        [ProducesResponseType((int)HttpStatusCode.OK)] 
+        [ProducesResponseType((int)HttpStatusCode.BadRequest)] 
+        public async Task<IActionResult> Generiraj(int broj)
+        {
+            if (broj <= 0)
+            {
+                return BadRequest("Broj mora biti veći od 0.");
+            }
+
+            for (int i = 0; i < broj; i++)
+            {
+                var g = new Gost()
+                {
+                    Ime = Faker.Name.First(),
+                    Prezime = Faker.Name.Last(),
+                    Email = Faker.Internet.Email()
+                };
+
+                _context.Gosti.Add(g);
+            }
+
+            await _context.SaveChangesAsync(); // Asinkrono spremanje promjena
+
+            return Ok();
         }
 
         /*/// <summary>

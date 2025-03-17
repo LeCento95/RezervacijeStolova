@@ -47,7 +47,10 @@ namespace Backend.Mapping
                 .ForMember(dest => dest.Cijena, opt => opt.MapFrom(src => src.Cijena));
             CreateMap<Jelovnik, JelovnikDTOInsertUpdate>();
 
-            
+            // Konfiguracija za Cijena svojstvo
+            CreateMap<decimal, decimal>().ConvertUsing(src => decimal.Round(src, 2));
+
+
             // Mapiranje narudzbi
             CreateMap<Narudzba, NarudzbaDTORead>().ForCtorParam(
                    "RezervacijaGost",
@@ -58,6 +61,9 @@ namespace Backend.Mapping
                );
             CreateMap<NarudzbaDTOInsertUpdate, Narudzba>();
             CreateMap<Narudzba, NarudzbaDTOInsertUpdate>();
+         
+        
+
 
             /*/// <summary>
        /// Metoda za dobivanje putanje do slike jelovnika.

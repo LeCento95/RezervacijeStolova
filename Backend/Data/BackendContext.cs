@@ -49,6 +49,15 @@ namespace Backend.Data
         /// </summary>
         public DbSet<Operater> Operateri { get; set; }
 
+        protected override void OnModelCreating(ModelBuilder builder)
+        {
+            base.OnModelCreating(builder);
+
+            builder.Entity<Jelovnik>()
+                .Property(j => j.Cijena)
+                .HasPrecision(18, 2); // Ili .HasColumnType("decimal(18, 2)");
+        }
+
 
 
 

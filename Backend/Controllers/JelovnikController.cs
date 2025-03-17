@@ -174,5 +174,50 @@ namespace Backend.Controllers
                 return BadRequest(new { poruka = ex.Message });
             }
         }
+
+        /// <summary>
+        /// Postavlja sliku za polaznika.
+        /// </summary>
+        /// <param name="sifra">Šifra polaznika.</param>
+        /// <param name="slika">Podaci o slici.</param>
+        /// <returns>Status postavljanja slike.</returns>
+        [HttpPut]
+        [Route("postaviSliku/{sifra:int}")]
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        public async Task<IActionResult> PostaviSliku(int sifra, SlikaDTO slika)
+        {
+            if (sifra <= 0)
+            {
+                return BadRequest("Šifra mora biti veća od nula (0)");
+            }
+            if (slika.Base64 == null || slika.Base64?.Length == 0)
+            {
+                return BadRequest("Slika nije postavljena");
+            }
+            var p = await _context.Jelovnik.FindAsync(sifra); // Upotreba async metode
+            if (p == null)
+            {
+                return BadRequest("Ne postoji polaznik s šifrom " + sifra + ".");
+            }
+            try
+            {
+                var ds = Path.DirectorySeparatorChar;
+                string dir = Path.Combine(Directory.GetCurrentDirectory()
+                    + ds + "wwwroot" + ds + "slike" + ds + "jelovnik");
+
+                if (!System.IO.Directory.Exists(dir))
+                {
+                    System.IO.Directory.CreateDirectory(dir);
+                }
+                var putanja = Path.Combine(dir + ds + sifra + ".png");
+                await System.IO.File.WriteAllBytesAsync(putanja, Convert.FromBase64String(slika.Base64!)); // Upotreba async metode
+                return Ok("Uspješno pohranjena slika");
+            }
+            catch (Exception e)
+            {
+                return BadRequest(e.Message);
+            }
+        }
     }
 }
