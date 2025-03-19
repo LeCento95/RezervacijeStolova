@@ -19,7 +19,7 @@ export default function NavBarRestorantReservation(){
                 <Navbar.Brand 
                 className='ruka'
                 onClick={()=>navigate(RouteNames.HOME)}
-                >Gosti</Navbar.Brand>
+                >Pocetna</Navbar.Brand>
                 <Navbar.Toggle aria-controls="basic-navbar-nav" />
                 <Navbar.Collapse id="basic-navbar-nav">
                 <Nav className="me-auto">
@@ -28,6 +28,9 @@ export default function NavBarRestorantReservation(){
                     <NavDropdown.Item
                     onClick={()=>navigate(RouteNames.GOST_PREGLED)}
                     >Gosti</NavDropdown.Item>
+                    <NavDropdown.Item
+                    onClick={()=>navigate(RouteNames.STOL_PREGLED)}
+                    >Stolovi</NavDropdown.Item>
                     
                     </NavDropdown>
                     <Nav.Link href={PRODUKCIJA + '/swagger'} target='_blank'>Swagger</Nav.Link>

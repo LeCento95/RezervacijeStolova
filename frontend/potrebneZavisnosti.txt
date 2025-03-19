@@ -1,4 +1,4 @@
-U CMD direktorij frontend izvesti
+U terminalu direktorija Frontend izvesti
 
 npm install react-bootstrap bootstrap
 npm install react-router-dom
@@ -6,3 +6,8 @@ npm install axios
 npm install react-number-format
 npm install moment
 npm install react-icons
+npm install react-bootstrap-typeahead
+----- ocjena 5
+npm install react-cropper
+npm install highcharts highcharts-react-official
+npm install react-countup

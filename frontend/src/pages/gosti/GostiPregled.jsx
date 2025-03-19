@@ -24,7 +24,7 @@ export default function GostiPregled() {
         alert(odgovor.poruka);
         return;
       }
-      dohvatiGoste(); // Ponovno dohvaćanje gostiju nakon brisanja
+      dohvatiGoste(); 
     } catch (error) {
       console.error("Greška pri brisanju gosta:", error);
     }
