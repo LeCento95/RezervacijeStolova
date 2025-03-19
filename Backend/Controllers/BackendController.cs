@@ -12,7 +12,7 @@ namespace Backend.Controllers
     /// <param name="mapper">Instanca IMapper sučelja koja se koristi za mapiranje objekata.</param>
     [ApiController] 
     [Route("api/[controller]")]
-    [Authorize]
+    //[Authorize]
     public abstract class BackendController(BackendContext context, IMapper mapper) : ControllerBase
     {
         /// <summary>
