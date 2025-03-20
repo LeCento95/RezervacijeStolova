@@ -31,6 +31,9 @@ export default function NavBarRestorantReservation(){
                     <NavDropdown.Item
                     onClick={()=>navigate(RouteNames.STOL_PREGLED)}
                     >Stolovi</NavDropdown.Item>
+                    <NavDropdown.Item
+                    onClick={()=>navigate(RouteNames.REZERVACIJA_PREGLED)}
+                    >Rezervacije</NavDropdown.Item>
                     
                     </NavDropdown>
                     <Nav.Link href={PRODUKCIJA + '/swagger'} target='_blank'>Swagger</Nav.Link>

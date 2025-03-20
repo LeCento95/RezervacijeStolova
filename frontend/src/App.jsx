@@ -13,6 +13,10 @@ import StoloviPregled from './pages/stolovi/StoloviPregled';
 import StoloviDodaj from './pages/stolovi/StoloviDodaj';
 import StoloviPromjena from './pages/stolovi/StoloviPromjena';
 import StoloviBrisanje from './pages/stolovi/StoloviBrisanje';
+import RezervacijePregled from './pages/rezervacije/RezervacijePregled';
+import RezervacijeDodaj from './pages/rezervacije/RezervacijeDodaj';
+import RezervacijePromjena from './pages/rezervacije/RezervacijePromjena';
+import RezervacijeBrisanje from './pages/rezervacije/RezervacijeBrisanje';
 import moment from 'moment';
 
 
@@ -33,14 +37,22 @@ function App() {
                     <Route path={RouteNames.GOST_NOVI} element={<GostiDodaj />} />
                     <Route path={RouteNames.GOST_PROMJENA} element={<GostiPromjena />} />
                     <Route path={RouteNames.GOST_BRISANJE} element={<GostiBrisanje />} />
-                  {/*Rezervacije*/}
-                    
+                  
                   {/*Stolovi*/}
                     <Route path={RouteNames.HOME} element={<Pocetna />} />
                     <Route path={RouteNames.STOL_PREGLED} element={<StoloviPregled />} />
                     <Route path={RouteNames.STOL_NOVI} element={<StoloviDodaj />} />
                     <Route path={RouteNames.STOL_PROMJENA} element={<StoloviPromjena />} />
                     <Route path={RouteNames.STOL_BRISANJE} element={<StoloviBrisanje />} />
+                  
+                  {/*Rezervacije*/}
+                    <Route path={RouteNames.HOME} element={<Pocetna />} />
+                    <Route path={RouteNames.REZERVACIJA_PREGLED} element={<RezervacijePregled />} />
+                    <Route path={RouteNames.REZERVACIJA_NOVA} element={<RezervacijeDodaj />} />
+                    <Route path={RouteNames.REZERVACIJA_PROMJENA} element={<RezervacijePromjena />} />
+                    <Route path={RouteNames.REZERVACIJA_BRISANJE} element={<RezervacijeBrisanje />} />
+
+
 
                    
                   

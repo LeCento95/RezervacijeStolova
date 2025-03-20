@@ -6,11 +6,15 @@ export const RouteNames={
     GOST_PROMJENA: '/gosti/:sifra',
     GOST_BRISANJE: '/gosti/obrisi/:sifra',
 
-
     STOL_PREGLED: '/stolovi',
     STOL_NOVI: '/stolovi/dodaj',
     STOL_PROMJENA: '/stolovi/:sifra',
     STOL_BRISANJE: '/stolovi/obrisi/:sifra',
+
+    REZERVACIJA_PREGLED: '/rezervacije',
+    REZERVACIJA_NOVA: '/rezervacije/dodaj',
+    REZERVACIJA_PROMJENA: '/rezervacije/:sifra',
+    REZERVACIJA_BRISANJE: '/rezervacije/obrisi/:sifra',
 
     
 }

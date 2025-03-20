@@ -12,15 +12,29 @@ async function get(){
         });
 }
 
-async function getBySifra(sifra){
+async function getBySifra(sifra) {
     return await HttpService.get(`/Gost/${sifra}`)
-        .then((odgovor) => {
-            return { greska: false, poruka: odgovor.data };
-        })
-        .catch((e) => {
-             console.error(`Greška prilikom dohvaćanja goste sa šifrom ${sifra}:`, e);
-             return { greska: true, poruka: `Greška prilikom dohvaćanja goste sa šifrom ${sifra}`};
-        });
+      .then((odgovor) => {
+        return { greska: false, poruka: odgovor.data };
+      })
+      .catch((e) => {
+        console.error(
+          `Greška prilikom dohvaćanja goste sa šifrom ${sifra}:`,
+          e
+        );
+        if (e.response) {
+          return {
+            greska: true,
+            poruka: `Greška prilikom dohvaćanja goste sa šifrom ${sifra}. Status: ${e.response.status}`,
+            detalji: e.response.data,
+          };
+        } else {
+          return {
+            greska: true,
+            poruka: `Greška prilikom dohvaćanja goste sa šifrom ${sifra}. Nema odgovora od servera.`,
+          };
+        }
+      });
 }
 
 
@@ -52,13 +66,13 @@ async function traziGosta(uvjet){
 }
 
 async function traziStranicenje(page, pageSize) {
-    return await HttpService.get(`/Rezervacija/traziStranicenje?page=${page}&pageSize=${pageSize}`)
+    return await HttpService.get(`/Gost/traziStranicenje?page=${page}&pageSize=${pageSize}`)
       .then((odgovor) => {
         return { greska: false, poruka: odgovor.data };
       })
       .catch((e) => {
-        console.error('Problem kod traženja stranice rezervacija:', e);
-        return { greska: true, poruka: 'Problem kod traženja stranice rezervacija.' };
+        console.error('Problem kod traženja stranice gostiju:', e);
+        return { greska: true, poruka: 'Problem kod traženja stranice gostiju.' };
       });
 }
 
