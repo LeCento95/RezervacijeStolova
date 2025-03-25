@@ -5,7 +5,7 @@ async function get(){
   return await HttpService.get('/Gost')
   .then((odgovor)=>{
       //console.table(odgovor.data);
-      return odgovor.data;
+      return {greska: false, poruka: odgovor.data};
   })
   .catch((e)=>{console.error(e)})
 }

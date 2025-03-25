@@ -43,7 +43,7 @@ export default function RezervacijePregled() {
   return (
     <Container>
       <h1 className="mt-4 mb-4">Pregled rezervacija</h1>
-      <Link to={RouteNames.REZERVACIJA_DODAJ} className="btn btn-primary mb-3">
+      <Link to={RouteNames.REZERVACIJA_NOVA} className="btn btn-primary mb-3">
         Dodaj novu rezervaciju
       </Link>
       <Table striped bordered hover>
@@ -60,8 +60,8 @@ export default function RezervacijePregled() {
         <tbody>
           {rezervacije.map((rezervacija) => (
             <tr key={rezervacija.sifra}>
-              <td>{rezervacija.gost.ime} {rezervacija.gost.prezime}</td>
-              <td>{rezervacija.stol.brojStola}</td>
+              <td>{rezervacija.gostImePrezime}</td>
+              <td>{rezervacija.stolBroj}</td>
               <td>{moment(rezervacija.datumVrijeme).format('DD.MM.YYYY HH:mm')}</td>
               <td>{rezervacija.brojOsoba}</td>
               <td>{rezervacija.napomena}</td>

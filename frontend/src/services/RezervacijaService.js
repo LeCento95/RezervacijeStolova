@@ -3,7 +3,7 @@ import { HttpService } from "./HttpService";
 async function get() {
   return await HttpService.get("/Rezervacija")
     .then((odgovor) => {
-      return { greska: false, podaci: odgovor.data };
+      return { greska: false, poruka: odgovor.data };
     })
     .catch((e) => {
       console.error("Greška prilikom dohvaćanja rezervacija:", e);
