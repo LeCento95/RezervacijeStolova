@@ -1,12 +1,15 @@
 import { HttpService } from "./HttpService";
 
-async function get(){
+async function get() {
   return await HttpService.get('/Stol')
-  .then((odgovor)=>{
-      console.table(odgovor.poruka);
-      return {greska: false, poruka: odgovor.poruka};
-  })
-  .catch((e)=>{console.error(e)})
+      .then((odgovor) => {
+          console.table(odgovor.data);
+          return odgovor.data; // Promijenjeno da se vraća odgovor.data
+      })
+      .catch((e) => {
+          console.error(e);
+          return []; // Vraća se prazan niz u slučaju greške
+      });
 }
 
 async function getBySifra(sifra){

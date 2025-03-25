@@ -65,13 +65,13 @@ export default function RezervacijePregled() {
               <td>{moment(rezervacija.datumVrijeme).format('DD.MM.YYYY HH:mm')}</td>
               <td>{rezervacija.brojOsoba}</td>
               <td>{rezervacija.napomena}</td>
-              <td>
-                <Button
-                  variant="danger"
-                  onClick={() => obrisiRezervacije(rezervacija.sifra)}
-                >
-                  Obriši
-                </Button>
+              <td style={{ display: "flex", gap: "10px" }}>
+                  <Button onClick={() => navigate(`/rezervacije/${rezervacija.sifra}`)}>
+                    Promjena
+                  </Button>
+                  <Button variant="danger" onClick={() => obrisi(rezervacija.sifra)}>
+                    Obriši
+                  </Button>
               </td>
             </tr>
           ))}

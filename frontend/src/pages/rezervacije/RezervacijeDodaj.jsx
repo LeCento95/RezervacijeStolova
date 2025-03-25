@@ -34,20 +34,23 @@ export default function RezervacijeDodaj() {
 
     async function dohvatiStolove() {
       showLoading();
-      const odgovor = await StolService.get();
-      hideLoading();
-      console.log("Odgovor iz StolService.get():", odgovor);
-      console.log("odgovor.poruka:", odgovor.poruka);
-      console.log("odgovor.poruka[0]:", odgovor.poruka[0]); // Dodano za debugiranje
-  
-      if (odgovor && odgovor.poruka && Array.isArray(odgovor.poruka) && odgovor.poruka.length > 0 && odgovor.poruka[0] && odgovor.poruka[0].sifra) {
+      try {
+        const odgovor = await StolService.get();
+        hideLoading();
+        console.log("Odgovor iz StolService.get():", odgovor);
+    
+        if (odgovor && odgovor.poruka && Array.isArray(odgovor.poruka) && odgovor.poruka.length > 0 && odgovor.poruka[0] && odgovor.poruka[0].sifra) {
           setStolovi(odgovor.poruka);
           setStolSifra(odgovor.poruka[0].sifra);
-      } else {
+        } else {
           console.error("Nema podataka o stolovima ili je odgovor pogrešan:", odgovor);
           setStolSifra(0);
+        }
+      } catch (error) {
+        console.error("Greška prilikom dohvaćanja stolova:", error);
+        hideLoading();
       }
-  }
+    }
 
     useEffect(() => {
         dohvatiGoste();
