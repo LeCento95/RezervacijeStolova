@@ -3,8 +3,8 @@ import { HttpService } from "./HttpService";
 async function get(){
   return await HttpService.get('/Stol')
   .then((odgovor)=>{
-      //console.table(odgovor.data);
-      return odgovor.data;
+      console.table(odgovor.poruka);
+      return {greska: false, poruka: odgovor.poruka};
   })
   .catch((e)=>{console.error(e)})
 }

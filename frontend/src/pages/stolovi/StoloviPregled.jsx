@@ -49,21 +49,27 @@ export default function StoloviPregled() {
           </tr>
         </thead>
         <tbody>
-          {stolovi.map((stol, index) => (
-            <tr key={index}>
-              <td>{stol.brojStola}</td>
-              <td>{stol.kapacitet}</td>
-              <td>{stol.lokacija}</td>
-              <td style={{ display: "flex", gap: "10px" }}>
-                <Button onClick={() => navigate(`/stolovi/${stol.sifra}`)}>
-                  Promjena
-                </Button>
-                <Button variant="danger" onClick={() => obrisi(stol.sifra)}>
-                  Obriši
-                </Button>
-              </td>
+          {stolovi && Array.isArray(stolovi) && stolovi.length > 0 ? (
+            stolovi.map((stol, index) => (
+              <tr key={index}>
+                <td>{stol.brojStola}</td>
+                <td>{stol.kapacitet}</td>
+                <td>{stol.lokacija}</td>
+                <td style={{ display: "flex", gap: "10px" }}>
+                  <Button onClick={() => navigate(`/stolovi/${stol.sifra}`)}>
+                    Promjena
+                  </Button>
+                  <Button variant="danger" onClick={() => obrisi(stol.sifra)}>
+                    Obriši
+                  </Button>
+                </td>
+              </tr>
+            ))
+          ) : (
+            <tr>
+              <td colSpan="4">Nema podataka o stolovima.</td>
             </tr>
-          ))}
+          )}
         </tbody>
       </Table>
     </>
