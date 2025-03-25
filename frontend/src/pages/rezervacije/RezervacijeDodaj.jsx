@@ -111,7 +111,7 @@ export default function RezervacijeDodaj() {
                           >
                               {stolovi && stolovi.length > 0 ? stolovi.map((stol) => (
                                   <option key={stol.sifra} value={stol.sifra}>
-                                      {stol.stolBroj}
+                                      {stol.brojStola} {stol.kapacitet} {stol.lokacija}
                                   </option>
                               )) : <option>Nema stolova</option>}
                           </Form.Select>

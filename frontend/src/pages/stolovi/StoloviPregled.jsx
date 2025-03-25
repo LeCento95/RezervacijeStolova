@@ -11,7 +11,7 @@ export default function StoloviPregled() {
   async function dohvatiStolove() {
     try {
       const odgovor = await StolService.get();
-      setStolovi(odgovor);
+      setStolovi(odgovor.poruka);
     } catch (error) {
       console.error("Greška pri dohvaćanju stolova:", error);
     }

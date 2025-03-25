@@ -4,7 +4,7 @@ async function get() {
   return await HttpService.get('/Stol')
       .then((odgovor) => {
           console.table(odgovor.data);
-          return odgovor.data; // Promijenjeno da se vraća odgovor.data
+          return {greska: false, poruka: odgovor.data}; // Promijenjeno da se vraća odgovor.data
       })
       .catch((e) => {
           console.error(e);
