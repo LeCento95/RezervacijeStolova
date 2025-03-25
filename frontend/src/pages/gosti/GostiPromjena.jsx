@@ -3,107 +3,113 @@ import { Link, useNavigate, useParams } from "react-router-dom";
 import { RouteNames } from "../../constants";
 import GostService from "../../services/GostService";
 import { useEffect, useState } from "react";
+import useLoading from "../../hooks/useLoading";
+import useError from '../../hooks/useError';
+
 
 export default function GostiPromjena() {
-  const navigate = useNavigate();
-  const [gost, setGost] = useState({});
-  const routeParams = useParams();
 
-  async function dohvatiGosta() {
-    try {
-      const odgovor = await GostService.getBySifra(routeParams.sifra);
-      setGost(odgovor);
-    } catch (error) {
-      console.error("Greška pri dohvaćanju podataka o gostu:", error);
+    const navigate = useNavigate();
+    const { showLoading, hideLoading } = useLoading();
+    const routeParams = useParams();
+    const [gosti, setGosti] = useState({});
+    const { prikaziError } = useError();
+
+
+    async function dohvatiGosti() {
+        showLoading();
+        const odgovor = await GostService.getBySifra(routeParams.sifra);
+        hideLoading();
+        if (odgovor.greska) {
+            prikaziError(odgovor.poruka);
+            return;
+        }
+        setGosti(odgovor.poruka);
+
     }
-  }
 
-  useEffect(() => {
-    dohvatiGosta();
-  }, [routeParams.sifra]);
+    useEffect(() => {
+        dohvatiGosti();
+    }, []);
 
-  async function promjena(gost) {
-    try {
-      const odgovor = await GostService.promjena(routeParams.sifra, gost);
-      if (odgovor.greska) {
-        alert(odgovor.poruka);
-        return;
-      }
-      navigate(RouteNames.GOST_PREGLED);
-    } catch (error) {
-      console.error("Greška pri ažuriranju podataka o gostu:", error);
+    async function promjena(e) {
+        showLoading();
+        const odgovor = await GostService.promjena(routeParams.sifra, e);
+        hideLoading();
+        if (odgovor.greska) {
+            prikaziError(odgovor.poruka);
+            return;
+        }
+        navigate(RouteNames.GOST_PREGLED);
     }
-  }
 
-  function odradiSubmit(e) {
-    e.preventDefault();
+    function obradiSubmit(e) { 
+        e.preventDefault();
 
-    let podaci = new FormData(e.target);
+        const podaci = new FormData(e.target);
 
-    promjena({
-      ime: podaci.get("ime"),
-      prezime: podaci.get("prezime"),
-      brojTelefona: podaci.get("brojTelefona"),
-      email: podaci.get("email"),
-    });
-  }
+        promjena({
+          ime: podaci.get("ime"),
+          prezime: podaci.get("prezime"),
+          brojTelefona: podaci.get("brojTelefona"),
+          email: podaci.get("email"),
+        });
 
-  return (
-    <>
-      <h2 className="naslov">Promjena gosta</h2>
-      <Form onSubmit={odradiSubmit}>
-        <Form.Group controlId="ime">
-          <Form.Label>Ime</Form.Label>
-          <Form.Control
-            type="text"
-            name="ime"
-            required
-            defaultValue={gost.ime || ""}
-          />
-        </Form.Group>
+    }
 
-        <Form.Group controlId="prezime">
-          <Form.Label>Prezime</Form.Label>
-          <Form.Control
-            type="text"
-            name="prezime"
-            required
-            defaultValue={gost.prezime || ""}
-          />
-        </Form.Group>
+    return (
+      <Row className="justify-content-center">
+          <Col md={6}>
+              <h1>Promjena gosta</h1>
+              <Form onSubmit={obradiSubmit}>
+                  <Form.Group className="mb-3" controlId="ime">
+                      <Form.Label>Ime</Form.Label>
+                      <Form.Control
+                          type="text"
+                          name="ime"
+                          defaultValue={gosti.ime}
+                          required
+                      />
+                  </Form.Group>
 
-        <Form.Group controlId="brojTelefona">
-          <Form.Label>Broj Telefona</Form.Label>
-          <Form.Control
-            type="number"
-            name="brojTelefona"
-            defaultValue={gost.brojTelefona || ""}
-          />
-        </Form.Group>
+                  <Form.Group className="mb-3" controlId="prezime">
+                      <Form.Label>Prezime</Form.Label>
+                      <Form.Control
+                          type="text"
+                          name="prezime"
+                          defaultValue={gosti.prezime}
+                          required
+                      />
+                  </Form.Group>
 
-        <Form.Group controlId="email">
-          <Form.Label>Email</Form.Label>
-          <Form.Control
-            type="text"
-            name="email"
-            defaultValue={gost.email || ""}
-          />
-        </Form.Group>
-        <hr />
+                  <Form.Group className="mb-3" controlId="brojTelefona">
+                      <Form.Label>Broj telefona</Form.Label>
+                      <Form.Control
+                          type="text"
+                          name="brojTelefona"
+                          defaultValue={gosti.brojTelefona}
+                          required
+                      />
+                  </Form.Group>
 
-        <Row>
-          <Col xs={6} sm={6} md={3} lg={2} xl={6} xxl={6}>
-            <Link to={RouteNames.GOST_PREGLED} className="btn btn-danger siroko">
-              Odustani
-            </Link>
+                  <Form.Group className="mb-3" controlId="email">
+                      <Form.Label>Email</Form.Label>
+                      <Form.Control
+                          type="email"
+                          name="email"
+                          defaultValue={gosti.email}
+                          required
+                      />
+                  </Form.Group>
+
+                  <Button variant="primary" type="submit">
+                      Promjeni
+                  </Button>
+                  <Link to={RouteNames.GOST_PREGLED} className="btn btn-secondary ms-2">
+                      Odustani
+                  </Link>
+              </Form>
           </Col>
-          <Col xs={6} sm={6} md={9} lg={10} xl={6} xxl={6}>
-            <Button variant="success" type="submit" className="siroko">
-              Promjeni gosta
-            </Button>
-          </Col>
-        </Row>
-      </Form>
-    </>
+      </Row>
   );
 }

@@ -14,8 +14,10 @@ export const RouteNames={
     REZERVACIJA_PREGLED: '/rezervacije',
     REZERVACIJA_NOVA: '/rezervacije/dodaj',
     REZERVACIJA_PROMJENA: '/rezervacije/:sifra',
-    REZERVACIJA_BRISANJE: '/rezervacije/obrisi/:sifra',
+    
 
+    LOGIN: '/login',
+    
     
 }
 

@@ -11,36 +11,29 @@ export default function NavBarRestorantReservation(){
 
     const navigate = useNavigate(); // ; u pravilu i ne treba
 
+    function OpenSwaggerURL(){
+        window.open(PRODUKCIJA + "/swagger/index.html", "_blank");
+    }
 
-    return(
-        <>
+
+    return (
         <Navbar expand="lg" className="bg-body-tertiary">
-            <Container>
-                <Navbar.Brand 
-                className='ruka'
-                onClick={()=>navigate(RouteNames.HOME)}
-                >Pocetna</Navbar.Brand>
-                <Navbar.Toggle aria-controls="basic-navbar-nav" />
-                <Navbar.Collapse id="basic-navbar-nav">
-                <Nav className="me-auto">
-                 
-                    <NavDropdown title="Programi" id="basic-nav-dropdown">
-                    <NavDropdown.Item
-                    onClick={()=>navigate(RouteNames.GOST_PREGLED)}
-                    >Gosti</NavDropdown.Item>
-                    <NavDropdown.Item
-                    onClick={()=>navigate(RouteNames.STOL_PREGLED)}
-                    >Stolovi</NavDropdown.Item>
-                    <NavDropdown.Item
-                    onClick={()=>navigate(RouteNames.REZERVACIJA_PREGLED)}
-                    >Rezervacije</NavDropdown.Item>
-                    
-                    </NavDropdown>
-                    <Nav.Link href={PRODUKCIJA + '/swagger'} target='_blank'>Swagger</Nav.Link>
-                </Nav>
-                </Navbar.Collapse>
-            </Container>
+          <Navbar.Brand href="/">Restoran Manager Reservation APP</Navbar.Brand>
+          <Navbar.Toggle aria-controls="basic-navbar-nav" />
+          <Navbar.Collapse id="basic-navbar-nav">
+            <Nav className="me-auto">
+              <Nav.Link onClick={() => navigate(RouteNames.HOME)}>Početna</Nav.Link>
+              <NavDropdown title="Programi" id="basic-nav-dropdown">
+                <NavDropdown.Item onClick={() => navigate(RouteNames.GOST_PREGLED)}>Gosti</NavDropdown.Item>
+                <NavDropdown.Item onClick={() => navigate(RouteNames.STOL_PREGLED)}>
+                  Stolovi
+                </NavDropdown.Item>
+                <NavDropdown.Item onClick={() => navigate(RouteNames.REZERVACIJA_PREGLED)}>Rezervacije</NavDropdown.Item>
+              </NavDropdown>
+              <Nav.Link onClick={() => OpenSwaggerURL()}>Swagger</Nav.Link>
+              <Nav.Link onClick={() => navigate(RouteNames.LOGIN)}>Prijava</Nav.Link>
+            </Nav>
+          </Navbar.Collapse>
         </Navbar>
-        </>
-    )
-}
+      );
+    }

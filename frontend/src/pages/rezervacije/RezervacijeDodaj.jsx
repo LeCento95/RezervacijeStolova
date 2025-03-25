@@ -1,149 +1,138 @@
-import { Button, Col, Form, Row } from "react-bootstrap";
-import { Link, useNavigate } from "react-router-dom";
-import { RouteNames } from "../../constants";
-import RezervacijaService from "../../services/RezervacijaService";
-import GostService from "../../services/GostService";
-import StolService from "../../services/StolService";
-import { useEffect, useState } from "react";
+import { Button, Col, Container, Form, Row} from 'react-bootstrap';
+import { Link, useNavigate } from 'react-router-dom';
+import { useEffect, useState } from 'react';
+import Service from '../../services/RezervacijaService';
+import GostService from '../../services/GostService';
+import StolService from '../../services/StolService';
+import DatePicker from 'react-datepicker';
+import 'react-datepicker/dist/react-datepicker.css';
+import { RouteNames } from '../../constants';
+import useLoading from "../../hooks/useLoading";
+import useError from '../../hooks/useError';
 
 export default function RezervacijeDodaj() {
   const navigate = useNavigate();
-  const [datumVrijeme, setDatumVrijeme] = useState("");
-  const [brojOsoba, setBrojOsoba] = useState(1);
-  const [napomena, setNapomena] = useState("");
-  const [imeGosta, setImeGosta] = useState("");
-  const [prezimeGosta, setPrezimeGosta] = useState("");
-  const [brojStola, setBrojStola] = useState("");
+  const {showLoading, hideLoading} = useLoading();
 
-  async function dodaj(rezervacija) {
-    try {
-      // Prvo dodajte gosta ako ne postoji
-      const gostOdgovor = await GostService.dodaj({
-        ime: imeGosta,
-        prezime: prezimeGosta,
-      });
+  const [gosti, setGosti] = useState([]);
+  const {gostSifra, setGostSifra} = useState(0);
 
-      // Zatim dodajte stol ako ne postoji
-      const stolOdgovor = await StolService.dodaj({
-        broj: brojStola,
-      });
+  const [stolovi, setStolovi] = useState([]);
+  const {stolSifra, setStolSifra} = useState(0);
 
-      // Sada dodajte rezervaciju s novim ID-jevima gosta i stola
-      const odgovor = await RezervacijaService.dodaj({
-        gost: gostOdgovor.sifra, // Pretpostavljamo da API vraća sifra novog gosta
-        stol: stolOdgovor.sifra, // Pretpostavljamo da API vraća sifra novog stola
-        datumVrijeme: datumVrijeme,
-        brojOsoba: parseInt(brojOsoba),
-        napomena: napomena,
-      });
+  const [datumVrijeme, setDatumVrijeme] = useState(new Date());
 
-      if (odgovor.greska) {
-        alert(odgovor.poruka);
-        return;
-      }
-      navigate(RouteNames.REZERVACIJA_PREGLED);
-    } catch (error) {
-      console.error("Greška pri dodavanju rezervacije:", error);
-    }
+  const {prikaziError} = useError();
+
+  async function dohvatiGoste() {
+    showLoading();
+    const odgovor = await GostService.get();
+    hideLoading();
+    setGosti(odgovor.poruka);
+    setGostSifra(odgovor.poruka[0].sifra);
   }
 
-  function odradiSubmit(e) {
+  async function dohvatiStolove() {
+    showLoading();
+    const odgovor = await StolService.get();
+    hideLoading();
+    setStolovi(odgovor.poruka);
+    setStolSifra(odgovor.poruka[0].sifra);
+  }
+
+  useEffect(() => {
+    dohvatiGoste();
+    dohvatiStolove();
+  }, []);
+
+  async function dodaj(e) {
+    showLoading();
+    const odgovor = await Service.dodaj(e);
+    hideLoading();
+    if(odgovor.greska){
+      prikaziError(odgovor.poruka);
+      return;
+    }
+    navigate(RouteNames.REZERVACIJA_PREGLED);
+  }
+
+  function obradiSubmit(e){
     e.preventDefault();
 
+    const podaci = new FormData(e.target);
+
     dodaj({
-      imeGosta: imeGosta,
-      prezimeGosta: prezimeGosta,
-      brojStola: brojStola,
-      datumVrijeme: datumVrijeme,
-      brojOsoba: parseInt(brojOsoba),
-      napomena: napomena,
-    });
+      gostSifra: parseInt(podaci.get('gostSifra')),
+      stolSifra: parseInt(podaci.get('stolSifra')),
+      datumVrijeme: podaci.get('datumVrijeme') ? new Date(podaci.get('datumVrijeme')).toISOString() : null,
+      brojOsoba: parseInt('brojOsoba'),
+      napomena: podaci.get('napomena'),
+      ime: podaci.get('Ime gosta'),
+      prezime: podaci.get('Prezime gosta'),
+      brojtelefona: podaci.get('Broj telefona gosta'),
+      email: podaci.get('Email gosta'),
+      brojStola: parseInt('brojStola'),
+      kapacitet: parseInt('kapacitet'),
+      lokacija: podaci.get('lokacija'),
+
+    })
   }
 
   return (
-    <>
-      <h2 className="naslov">Dodavanje rezervacije</h2>
-      <Form onSubmit={odradiSubmit}>
-        <Form.Group controlId="imeGosta">
-          <Form.Label>Ime gosta</Form.Label>
-          <Form.Control
-            type="text"
-            name="imeGosta"
-            value={imeGosta}
-            onChange={(e) => setImeGosta(e.target.value)}
-            required
-          />
-        </Form.Group>
+    <Container>
+      <Row className="mt-5">
+        <Col md={{ span: 6, offset: 3 }}>
+          <h1 className="mb-5">Dodaj novu rezervaciju</h1>
+          <Form onSubmit={obradiSubmit}>
+            <Form.Group className="mb-3">
+              <Form.Label>Gost</Form.Label>
+              <Form.Select name="gostSifra">
+                {gosti.map(gost => (
+                  <option key={gost.sifra} value={gost.sifra}>{gost.ime} {gost.prezime}</option>
+                ))}
+              </Form.Select>
+            </Form.Group>
 
-        <Form.Group controlId="prezimeGosta">
-          <Form.Label>Prezime gosta</Form.Label>
-          <Form.Control
-            type="text"
-            name="prezimeGosta"
-            value={prezimeGosta}
-            onChange={(e) => setPrezimeGosta(e.target.value)}
-            required
-          />
-        </Form.Group>
+            <Form.Group className="mb-3">
+              <Form.Label>Stol</Form.Label>
+              <Form.Select name="stolSifra">
+                {stolovi.map(stol => (
+                  <option key={stol.sifra} value={stol.sifra}>{stol.brojStola}</option>
+                ))}
+              </Form.Select>
+            </Form.Group>
 
-        <Form.Group controlId="brojStola">
-          <Form.Label>Broj stola</Form.Label>
-          <Form.Control
-            type="text"
-            name="brojStola"
-            value={brojStola}
-            onChange={(e) => setBrojStola(e.target.value)}
-            required
-          />
-        </Form.Group>
+            <Form.Group className="mb-3">
+              <Form.Label>Datum i vrijeme</Form.Label>
+              <DatePicker
+                selected={datumVrijeme}
+                onChange={(date) => setDatumVrijeme(date)}
+                showTimeSelect
+                dateFormat="Pp"
+                name="datumVrijeme"
+                className="form-control"
+              />
+            </Form.Group>
 
-        <Form.Group controlId="datumVrijeme">
-          <Form.Label>Datum i vrijeme</Form.Label>
-          <Form.Control
-            type="datetime-local"
-            name="datumVrijeme"
-            value={datumVrijeme}
-            onChange={(e) => setDatumVrijeme(e.target.value)}
-            required
-          />
-        </Form.Group>
+            <Form.Group className="mb-3">
+              <Form.Label>Broj osoba</Form.Label>
+              <Form.Control type="number" name="brojOsoba" />
+            </Form.Group>
 
-        <Form.Group controlId="brojOsoba">
-          <Form.Label>Broj osoba</Form.Label>
-          <Form.Control
-            type="number"
-            name="brojOsoba"
-            value={brojOsoba}
-            onChange={(e) => setBrojOsoba(e.target.value)}
-            required
-          />
-        </Form.Group>
+            <Form.Group className="mb-3">
+              <Form.Label>Napomena</Form.Label>
+              <Form.Control type="text" name="napomena" />
+            </Form.Group>
 
-        <Form.Group controlId="napomena">
-          <Form.Label>Napomena</Form.Label>
-          <Form.Control
-            type="text"
-            name="napomena"
-            value={napomena}
-            onChange={(e) => setNapomena(e.target.value)}
-          />
-        </Form.Group>
-
-        <hr />
-
-        <Row>
-          <Col xs={6} sm={6} md={3} lg={2} xl={6} xxl={6}>
-            <Link to={RouteNames.REZERVACIJA_PREGLED} className="btn btn-danger siroko">
+            <Button variant="primary" type="submit">
+              Dodaj
+            </Button>
+            <Link to={RouteNames.REZERVACIJA_PREGLED} className="btn btn-secondary ms-2">
               Odustani
             </Link>
-          </Col>
-          <Col xs={6} sm={6} md={9} lg={10} xl={6} xxl={6}>
-            <Button variant="success" type="submit" className="siroko">
-              Dodaj rezervaciju
-            </Button>
-          </Col>
-        </Row>
-      </Form>
-    </>
+          </Form>
+        </Col>
+      </Row>
+    </Container>
   );
 }

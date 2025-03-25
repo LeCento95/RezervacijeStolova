@@ -214,7 +214,7 @@ namespace Backend.Controllers
                 return BadRequest(new { poruka = e.Message });
             }
         }
-
+        /*
         /// <summary>
         /// Generira polaznike.
         /// </summary>
@@ -246,9 +246,9 @@ namespace Backend.Controllers
             await _context.SaveChangesAsync(); // Asinkrono spremanje promjena
 
             return Ok();
-        }
+        }*/
 
-        /*/// <summary>
+        /// <summary>
         /// Traži goste s paginacijom.
         /// </summary>
         /// <param name="stranica">Broj stranice.</param>
@@ -279,13 +279,13 @@ namespace Backend.Controllers
 
             query = query.OrderBy(g => g.Prezime).ThenBy(g => g.Ime);
 
-            var g = await Task.Run(() => query.ToList()); // Use Task.Run to offload the query execution to a background thread.
+            var g = await Task.Run(() => query.ToList()); 
             return Ok(_mapper.Map<List<GostDTORead>>(g.Skip((poStranici * stranica) - poStranici).Take(poStranici)));
         }
         catch (Exception e)
         {
             return BadRequest(e.Message);
         }
-        }*/
+        }
     }
 }

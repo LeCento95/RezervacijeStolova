@@ -16,54 +16,61 @@ import StoloviBrisanje from './pages/stolovi/StoloviBrisanje';
 import RezervacijePregled from './pages/rezervacije/RezervacijePregled';
 import RezervacijeDodaj from './pages/rezervacije/RezervacijeDodaj';
 import RezervacijePromjena from './pages/rezervacije/RezervacijePromjena';
-import RezervacijeBrisanje from './pages/rezervacije/RezervacijeBrisanje';
-import moment from 'moment';
+
+
+
+import LoadingSpinner from './components/LoadingSpinner'
+import Login from "./pages/Login"
+import useError from "./hooks/useError"
+import ErrorModal from './components/ErrorModal'
+
 
 
 function App() {
-    function trenutnaGodina() {
-        return moment().year();
+    
+    const {errors, prikaziErrorModal, sakrijError} = useError();
+
+    function godina(){
+      const pocetna = 2024;
+      const trenutna = new Date().getFullYear();
+      if(pocetna === trenutna){
+        return trenutna;
+      }
+      return pocetna + ' - ' + trenutna;
     }
 
     return (
-        <>
-            <Container>
-                <NavBarRestorantReservation />
+      <>
+        <LoadingSpinner />
+        <ErrorModal show={prikaziErrorModal} errors={errors} onHide={sakrijError} />
+        <Container className='aplikacija'>
+          <NavBarRestorantReservation />
+          <Routes>
+            <Route path={RouteNames.HOME} element={<Pocetna />} />
+            <Route path={RouteNames.GOST_PREGLED} element={<GostiPregled />} />
+            <Route path={RouteNames.GOST_NOVI} element={<GostiDodaj />} />
+            <Route path={RouteNames.GOST_PROMJENA} element={<GostiPromjena />} />
+            <Route path={RouteNames.GOST_BRISANJE} element={<GostiBrisanje />} />
+  
+            <Route path={RouteNames.STOL_PREGLED} element={<StoloviPregled />} />
+            <Route path={RouteNames.STOL_NOVI} element={<StoloviDodaj />} />
+            <Route path={RouteNames.STOL_PROMJENA} element={<StoloviPromjena />} />
+            <Route path={RouteNames.STOL_BRISANJE} element={<StoloviBrisanje />} />
+  
+            <Route path={RouteNames.REZERVACIJA_PREGLED} element={<RezervacijePregled />} />
+            <Route path={RouteNames.REZERVACIJA_NOVA} element={<RezervacijeDodaj />} />
+            <Route path={RouteNames.REZERVACIJA_PROMJENA} element={<RezervacijePromjena />} />
+            
+  
+            <Route path={RouteNames.LOGIN} element={<Login />} />
+          </Routes>
+        </Container>
+        <Container>
+          <hr />
+          Restorant Manager Reservation &copy; {godina()}
+        </Container>
+      </>
+    )
+  }
 
-                <Routes>
-                  {/*Gosti*/}
-                    <Route path={RouteNames.HOME} element={<Pocetna />} />
-                    <Route path={RouteNames.GOST_PREGLED} element={<GostiPregled />} />
-                    <Route path={RouteNames.GOST_NOVI} element={<GostiDodaj />} />
-                    <Route path={RouteNames.GOST_PROMJENA} element={<GostiPromjena />} />
-                    <Route path={RouteNames.GOST_BRISANJE} element={<GostiBrisanje />} />
-                  
-                  {/*Stolovi*/}
-                    <Route path={RouteNames.HOME} element={<Pocetna />} />
-                    <Route path={RouteNames.STOL_PREGLED} element={<StoloviPregled />} />
-                    <Route path={RouteNames.STOL_NOVI} element={<StoloviDodaj />} />
-                    <Route path={RouteNames.STOL_PROMJENA} element={<StoloviPromjena />} />
-                    <Route path={RouteNames.STOL_BRISANJE} element={<StoloviBrisanje />} />
-                  
-                  {/*Rezervacije*/}
-                    <Route path={RouteNames.HOME} element={<Pocetna />} />
-                    <Route path={RouteNames.REZERVACIJA_PREGLED} element={<RezervacijePregled />} />
-                    <Route path={RouteNames.REZERVACIJA_NOVA} element={<RezervacijeDodaj />} />
-                    <Route path={RouteNames.REZERVACIJA_PROMJENA} element={<RezervacijePromjena />} />
-                    <Route path={RouteNames.REZERVACIJA_BRISANJE} element={<RezervacijeBrisanje />} />
-
-
-
-                   
-                  
-
-                </Routes>
-
-                <hr />
-                &copy; RestorantManagerReservation {trenutnaGodina()}
-            </Container>
-        </>
-    );
-}
-
-export default App;
+  export default App

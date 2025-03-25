@@ -3,11 +3,11 @@ import { HttpService } from "./HttpService";
 async function get() {
   return await HttpService.get("/Rezervacija")
     .then((odgovor) => {
-      return odgovor.data;
+      return { greska: false, podaci: odgovor.data };
     })
     .catch((e) => {
       console.error("Greška prilikom dohvaćanja rezervacija:", e);
-      return null;
+      return { greska: true, poruka: "Greška prilikom dohvaćanja rezervacija." };
     });
 }
 
@@ -17,11 +17,22 @@ async function getBySifra(sifra) {
       return { greska: false, poruka: odgovor.data };
     })
     .catch((e) => {
-      console.error(`Greška prilikom dohvaćanja rezervacije sa šifrom ${sifra}:`, e);
-      return {
-        greska: true,
-        poruka: `Greška prilikom dohvaćanja rezervacije sa šifrom ${sifra}`,
-      };
+      console.error(
+        `Greška prilikom dohvaćanja rezervacije sa šifrom ${sifra}:`,
+        e
+      );
+      if (e.response) {
+        return {
+          greska: true,
+          poruka: `Greška prilikom dohvaćanja rezervacije sa šifrom ${sifra}. Status: ${e.response.status}`,
+          detalji: e.response.data,
+        };
+      } else {
+        return {
+          greska: true,
+          poruka: `Greška prilikom dohvaćanja rezervacije sa šifrom ${sifra}. Nema odgovora od servera.`,
+        };
+      }
     });
 }
 
@@ -30,8 +41,9 @@ async function dodaj(rezervacija) {
     .then(() => {
       return { greska: false, poruka: "Dodano" };
     })
-    .catch(() => {
-      return { greska: true, poruka: "Problem kod dodavanja" };
+    .catch((e) => {
+      console.error("Greška prilikom dodavanja rezervacije:", e);
+      return { greska: true, poruka: "Problem kod dodavanja rezervacije." };
     });
 }
 
@@ -40,8 +52,9 @@ async function promjena(sifra, rezervacija) {
     .then(() => {
       return { greska: false, poruka: "Promijenjeno" };
     })
-    .catch(() => {
-      return { greska: true, poruka: "Problem kod promjene" };
+    .catch((e) => {
+      console.error("Greška prilikom promjene rezervacije:", e);
+      return { greska: true, poruka: "Problem kod promjene rezervacije." };
     });
 }
 
@@ -50,8 +63,9 @@ async function obrisi(sifra) {
     .then(() => {
       return { greska: false, poruka: "Obrisano" };
     })
-    .catch(() => {
-      return { greska: true, poruka: "Problem kod brisanja" };
+    .catch((e) => {
+      console.error("Greška prilikom brisanja rezervacije:", e);
+      return { greska: true, poruka: "Problem kod brisanja rezervacije." };
     });
 }
 
