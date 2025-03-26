@@ -24,7 +24,7 @@ export default function JelovniciPromjena() {
     const [slikaZaServer, setSlikaZaServer] = useState("");
     const cropperRef = useRef(null);
 
-    async function dohvatiPolaznik(){
+    async function dohvatiJelovnik(){
         showLoading();
         const odgovor = await Service.getBySifra(routeParams.sifra);
         hideLoading();
@@ -32,7 +32,7 @@ export default function JelovniciPromjena() {
             prikaziError(odgovor.poruka);
             return;
         }
-        setPolaznik(odgovor.poruka);
+        setJelovnik(odgovor.poruka);
 
         if(odgovor.poruka.slika!=null){
             setTrenutnaSlika(PRODUKCIJA + odgovor.poruka.slika + `?${Date.now()}`); 
@@ -42,7 +42,7 @@ export default function JelovniciPromjena() {
     }
 
     useEffect(()=>{
-        dohvatiPolaznik();
+        dohvatiJelovnik();
     },[]);
 
     async function promjena(e){
@@ -53,7 +53,7 @@ export default function JelovniciPromjena() {
             prikaziError(odgovor.poruka);
             return;
         }
-        navigate(RouteNames.POLAZNIK_PREGLED);
+        navigate(RouteNames.JELOVNIK_PREGLED);
     }
 
     function obradiSubmit(e){ // e predstavlja event
@@ -167,7 +167,7 @@ export default function JelovniciPromjena() {
                     </Col>
                     <Col xs={6} sm={6} md={9} lg={6} xl={6} xxl={6}>
                     <Button variant="primary" type="submit" className="siroko">
-                        Promjeni polaznika
+                        Promjeni jelo
                     </Button>
                     </Col>
                 </Row>

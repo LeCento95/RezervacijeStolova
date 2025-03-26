@@ -19,7 +19,7 @@ export default function JelovniciPregled() {
 
     async function dohvatiJelovnike() {
         showLoading();
-        const odgovor = await Service.getStranicenje(stranica, uvjet);
+        const odgovor = await Service.traziStranicenje(stranica, uvjet);
         hideLoading();
         if (odgovor.greska) {
             prikaziError(odgovor.poruka);
@@ -98,7 +98,7 @@ export default function JelovniciPregled() {
                     />
                 </Col>
                 <Col key={2} sm={12} lg={4} md={4}>
-                    {polaznici && polaznici.length > 0 && (
+                    {jelovnici && jelovnici.length > 0 && (
                             <div style={{ display: "flex", justifyContent: "center" }}>
                                 <Pagination size="lg">
                                 <Pagination.Prev onClick={smanjiStranicu} />
@@ -147,7 +147,7 @@ export default function JelovniciPregled() {
       }
       </Row>
       <hr />
-              {polaznici && polaznici.length > 0 && (
+              {jelovnici && jelovnici.length > 0 && (
                 <div style={{ display: "flex", justifyContent: "center" }}>
                     <Pagination size="lg">
                     <Pagination.Prev onClick={smanjiStranicu} />
