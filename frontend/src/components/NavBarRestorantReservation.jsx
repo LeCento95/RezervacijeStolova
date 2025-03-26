@@ -25,10 +25,14 @@ export default function NavBarRestorantReservation(){
               <Nav.Link onClick={() => navigate(RouteNames.HOME)}>Početna</Nav.Link>
               <NavDropdown title="Programi" id="basic-nav-dropdown">
                 <NavDropdown.Item onClick={() => navigate(RouteNames.GOST_PREGLED)}>Gosti</NavDropdown.Item>
-                <NavDropdown.Item onClick={() => navigate(RouteNames.STOL_PREGLED)}>
-                  Stolovi
-                </NavDropdown.Item>
+                
+                <NavDropdown.Item onClick={() => navigate(RouteNames.STOL_PREGLED)}> Stolovi</NavDropdown.Item>
+                
                 <NavDropdown.Item onClick={() => navigate(RouteNames.REZERVACIJA_PREGLED)}>Rezervacije</NavDropdown.Item>
+              
+                <NavDropdown.Item onClick={() => navigate(RouteNames.JELOVNIK_PREGLED)}>Jelovnik</NavDropdown.Item>
+              
+                <NavDropdown.Item onClick={() => navigate(RouteNames.NARUDZBA_PREGLED)}>Narudzba</NavDropdown.Item>
               </NavDropdown>
               <Nav.Link onClick={() => OpenSwaggerURL()}>Swagger</Nav.Link>
               <Nav.Link onClick={() => navigate(RouteNames.LOGIN)}>Prijava</Nav.Link>

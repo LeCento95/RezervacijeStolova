@@ -4,7 +4,7 @@ import { HttpService } from "./HttpService"
 async function get(){
     return await HttpService.get('/Jelovnik')
     .then((odgovor)=>{
-        //console.table(odgovor.data);
+        console.table(odgovor.data);
         return odgovor.data;
     })
     .catch((e)=>{console.error(e)})
@@ -23,7 +23,7 @@ async function getBySifra(sifra){
 async function obrisi(sifra) {
     return await HttpService.delete('/Jelovnik/' + sifra)
     .then((odgovor)=>{
-        //console.log(odgovor);
+        console.log(odgovor);
         return {greska: false, poruka: odgovor.data}
     })
     .catch(()=>{

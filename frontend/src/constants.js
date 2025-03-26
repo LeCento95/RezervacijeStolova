@@ -14,6 +14,12 @@ export const RouteNames={
     REZERVACIJA_PREGLED: '/rezervacije',
     REZERVACIJA_NOVA: '/rezervacije/dodaj',
     REZERVACIJA_PROMJENA: '/rezervacije/:sifra',
+
+    JELOVNIK_PREGLED: '/jelovnik',
+    JELOVNIK_NOVI: '/jelovnik/dodaj',
+    JELOVNIK_PROMJENA: '/jelovnik/:sifra',
+
+    
     
 
     LOGIN: '/login',

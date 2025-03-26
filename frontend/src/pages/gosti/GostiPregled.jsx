@@ -1,6 +1,6 @@
 import { Button, Card, Col, Form, Pagination, Row } from "react-bootstrap";
 import GostService from "../../services/GostService";
-import { useEffect, useState, useCallback } from "react";
+import { useEffect, useState } from "react";
 import { RouteNames } from "../../constants";
 import { Link } from "react-router-dom";
 import { IoIosAdd } from "react-icons/io";
@@ -11,7 +11,7 @@ import useError from "../../hooks/useError";
 export default function GostiPregled() {
   const [gosti, setGosti] = useState([]);
   const [stranica, setStranica] = useState(1);
-  const [uvjet, setUvjet] = useState('');
+  const [uvjet, setUvjet] = useState("");
   const { showLoading, hideLoading } = useLoading();
   const { prikaziError } = useError();
 
@@ -21,26 +21,24 @@ export default function GostiPregled() {
     hideLoading();
     if (odgovor.greska) {
       prikaziError(odgovor.poruka);
-
       return;
     }
-    if(odgovor.poruka.lenght==0){
-      setStranica(stranica-1);
+    if (odgovor.poruka.length === 0 && stranica > 1) {
+      setStranica(stranica - 1);
       return;
-
     }
     setGosti(odgovor.poruka);
   }
 
   useEffect(() => {
     dohvatiGoste();
-  }, [stranica, uvjet]);
+  }, [stranica, uvjet]); // Pozivanje funkcije dohvatiGoste kada se promijeni stranica ili uvjet
 
   async function obrisiAsync(sifra) {
     showLoading();
+    const odgovor = await GostService.delete(sifra);
     hideLoading();
-    //console.log(odgovor);
-    if(odgovor.greska){
+    if (odgovor.greska) {
       prikaziError(odgovor.poruka);
       return;
     }
@@ -52,17 +50,26 @@ export default function GostiPregled() {
   }
 
   function promjeniUvjet(e) {
-    if (e.nativeEvent.key === "Enter") {
-     console.log('Enter')
-      setStranica(1);
-      setUvjet(e.nativeEvent.srcElement.value);
-      setGosti([]);
+    if (e.key === "Enter") {
+      const noviUvjet = e.target.value;
+      if (noviUvjet.length >= 3) {
+        setStranica(1);
+        setUvjet(noviUvjet);
+        setGosti([]);
+      } else {
+        if (noviUvjet.length > 0) {
+          prikaziError('Uvjet traženja mora imati najmanje 3 slova.');
+        } else {
+          setStranica(1);
+          setUvjet(noviUvjet);
+          setGosti([]);
+        }
+      }
+    }
   }
-}
 
   function povecajStranicu() {
     setStranica(stranica + 1);
-    dohvatiGoste();
   }
 
   function smanjiStranicu() {
@@ -70,7 +77,6 @@ export default function GostiPregled() {
       return;
     }
     setStranica(stranica - 1);
-    dohvatiGoste();
   }
 
   return (
@@ -80,10 +86,10 @@ export default function GostiPregled() {
           <Form.Control
             type="text"
             name="trazilica"
-            placeholder="Dio imena i prezimena [Enter]"
+            placeholder="Dio imena i prezimena"
             maxLength={255}
             defaultValue=""
-            onKeyUp={promjeniUvjet}
+            onChange={promjeniUvjet}
           />
         </Col>
         <Col key={2} sm={12} lg={4} md={4}>

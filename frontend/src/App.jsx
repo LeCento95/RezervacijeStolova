@@ -16,6 +16,10 @@ import StoloviBrisanje from './pages/stolovi/StoloviBrisanje';
 import RezervacijePregled from './pages/rezervacije/RezervacijePregled';
 import RezervacijeDodaj from './pages/rezervacije/RezervacijeDodaj';
 import RezervacijePromjena from './pages/rezervacije/RezervacijePromjena';
+import JelovniciDodaj from './pages/jelovnici/JelovniciDodaj';
+import JelovniciPregled from './pages/jelovnici/JelovniciPregled';
+import JelovniciPromjena from './pages/jelovnici/JelovniciPromjena';
+
 
 
 
@@ -60,6 +64,12 @@ function App() {
             <Route path={RouteNames.REZERVACIJA_PREGLED} element={<RezervacijePregled />} />
             <Route path={RouteNames.REZERVACIJA_NOVA} element={<RezervacijeDodaj />} />
             <Route path={RouteNames.REZERVACIJA_PROMJENA} element={<RezervacijePromjena />} />
+
+            <Route path={RouteNames.JELOVNIK_PREGLED} element={<JelovniciPregled />} />
+            <Route path={RouteNames.JELOVNIK_NOVI} element={<JelovniciDodaj />} />
+            <Route path={RouteNames.JELOVNIK_PROMJENA} element={<JelovniciPromjena />} />
+
+            
             
   
             <Route path={RouteNames.LOGIN} element={<Login />} />

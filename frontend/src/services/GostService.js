@@ -4,7 +4,7 @@ import { HttpService } from "./HttpService";
 async function get(){
   return await HttpService.get('/Gost')
   .then((odgovor)=>{
-      //console.table(odgovor.data);
+      console.table(odgovor.data);
       return {greska: false, poruka: odgovor.data};
   })
   .catch((e)=>{console.error(e)})
@@ -62,7 +62,7 @@ async function promjena(sifra,Gost) {
 async function obrisi(sifra) {
   return await HttpService.delete('/Gost/' + sifra)
   .then((odgovor)=>{
-      //console.log(odgovor);
+      console.log(odgovor);
       return {greska: false, poruka: odgovor.data}
   })
   .catch(()=>{
@@ -73,17 +73,17 @@ async function obrisi(sifra) {
 async function traziGosta(uvjet){
     return await HttpService.get('/Gost/trazi/'+uvjet)
     .then((odgovor)=>{
-        //console.table(odgovor.data);
+        console.table(odgovor.data);
         return {greska: false, poruka: odgovor.data}
     })
     .catch((e)=>{return {greska: true, poruka: 'Problem kod traženja gosta.'}})
 }
 
-async function getStranicenje(stranica,uvjet){
-  return await HttpService.get('/Gost/traziStranicenje/'+stranica + '?uvjet=' + uvjet)
-  .then((odgovor)=>{return  {greska: false, poruka: odgovor.data};})
-  .catch((e)=>{ return {greska: true, poruka: 'Problem kod traženja polaznika '}});
-}
+async function traziStranicenje(stranica,uvjet){
+    return await HttpService.get('/Gost/traziStranicenje/'+stranica + '?uvjet=' + uvjet)
+    .then((odgovor)=>{return  {greska: false, poruka: odgovor.data};})
+    .catch((e)=>{ return {greska: true, poruka: 'Problem kod traženja gosta '}});
+  }
 
 
 
@@ -96,5 +96,5 @@ export default{
     obrisi,
     
     traziGosta,
-    getStranicenje
+    traziStranicenje
 };
