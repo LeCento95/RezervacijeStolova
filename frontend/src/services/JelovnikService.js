@@ -69,6 +69,12 @@ async function promjena(sifra,Jelovnik) {
     })
 }
 
+async function traziStranicenje(stranica,uvjet){
+    return await HttpService.get('/Jelovnik/traziStranicenje/'+stranica + '?uvjet=' + uvjet)
+    .then((odgovor)=>{return  {greska: false, poruka: odgovor.data};})
+    .catch((e)=>{ return {greska: true, poruka: 'Problem kod traženja jelovnika '}});
+  }
+
 async function postaviSliku(sifra, slika) {
     return await HttpService.put('/Jelovnik/postaviSliku/' + sifra, slika)
     .then((odgovor)=>{return  {greska: false, poruka: odgovor.data};})
@@ -83,6 +89,7 @@ export default{
     dodaj,
     promjena,
 
+    traziStranicenje,
     postaviSliku,
 
     
