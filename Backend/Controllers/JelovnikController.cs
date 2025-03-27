@@ -176,6 +176,49 @@ namespace Backend.Controllers
         }
 
         /// <summary>
+        /// Pretražuje jelovnik s mogućnošću stranice.
+        /// </summary>
+        /// <param name="stranica">Broj stranice.</param>
+        /// <param name="uvjet">Uvjet pretraživanja.</param>
+        /// <returns>Lista DTO-ova stavki jelovnika.</returns>
+        [HttpGet]
+        [Route("traziStranicenje/{stranica}")]
+        [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(IEnumerable<JelovnikDTORead>))]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        public async Task<IActionResult> TraziJelovnikStranicenje(int stranica, string uvjet = "")
+        {
+            var poStranici = 7;
+            uvjet = uvjet.ToLower();
+
+            try
+            {
+                IQueryable<Jelovnik> query = _context.Jelovnik;
+
+                var niz = uvjet.Split(" ");
+
+                foreach (var s in niz)
+                {
+                    query = query.Where(j =>
+                        j.NazivJela.Contains(s)
+
+                    );
+                }
+
+                query = query.OrderBy(j => j.NazivJela);
+
+                var j = await Task.Run(() => query.ToList());
+                return Ok(_mapper.Map<List<JelovnikDTORead>>(j.Skip((poStranici * stranica) - poStranici).Take(poStranici)));
+            }
+            catch (Exception e)
+            {
+                return BadRequest(e.Message);
+            }
+        }
+    
+
+
+
+        /// <summary>
         /// Postavlja sliku za polaznika.
         /// </summary>
         /// <param name="sifra">Šifra polaznika.</param>
