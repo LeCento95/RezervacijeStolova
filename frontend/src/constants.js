@@ -23,6 +23,7 @@ export const RouteNames={
     
 
     LOGIN: '/login',
+    ERA: '/era'
     
     
 }

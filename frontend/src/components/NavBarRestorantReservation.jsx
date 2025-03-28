@@ -11,6 +11,7 @@ export default function NavBarRestorantReservation(){
 
     const navigate = useNavigate(); // ; u pravilu i ne treba
 
+    
     function OpenSwaggerURL(){
         window.open(PRODUKCIJA + "/swagger/index.html", "_blank");
     }
@@ -35,6 +36,7 @@ export default function NavBarRestorantReservation(){
                 <NavDropdown.Item onClick={() => navigate(RouteNames.NARUDZBA_PREGLED)}>Narudzba</NavDropdown.Item>
               </NavDropdown>
               <Nav.Link onClick={() => OpenSwaggerURL()}>Swagger</Nav.Link>
+              <Nav.Link onClick={()=>navigate(RouteNames.ERA)}>ERA dijagram</Nav.Link>
               <Nav.Link onClick={() => navigate(RouteNames.LOGIN)}>Prijava</Nav.Link>
             </Nav>
           </Navbar.Collapse>

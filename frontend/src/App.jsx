@@ -27,6 +27,7 @@ import LoadingSpinner from './components/LoadingSpinner'
 import Login from "./pages/Login"
 import useError from "./hooks/useError"
 import ErrorModal from './components/ErrorModal'
+import EraDijagram from './pages/EraDiagram'
 
 
 
@@ -50,6 +51,9 @@ function App() {
         <Container className='aplikacija'>
           <NavBarRestorantReservation />
           <Routes>
+          <Route path={RouteNames.HOME} element={<Pocetna />} />
+          
+        <>
             <Route path={RouteNames.HOME} element={<Pocetna />} />
             <Route path={RouteNames.GOST_PREGLED} element={<GostiPregled />} />
             <Route path={RouteNames.GOST_NOVI} element={<GostiDodaj />} />
@@ -72,15 +76,22 @@ function App() {
             
             
   
+            <Route path={RouteNames.ERA} element={<EraDijagram />} /> 
+          </>
+         : (
+          <>
             <Route path={RouteNames.LOGIN} element={<Login />} />
-          </Routes>
-        </Container>
-        <Container>
-          <hr />
-          Restorant Manager Reservation &copy; {godina()}
-        </Container>
-      </>
-    )
-  }
+          </>
+        )
+        </Routes>
+      </Container>
+      <Container>
+        <hr />
+        Edunova &copy; {godina()}
+      </Container>
+    </>
+  )
+}
 
-  export default App
+
+export default App

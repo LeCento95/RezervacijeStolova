@@ -176,6 +176,62 @@ namespace Backend.Controllers
         }
 
         /// <summary>
+        /// Pretražuje jelovnik prema uvjetu.
+        /// </summary>
+        /// <param name="uvjet">Uvjet pretraživanja.</param>
+        /// <returns>Lista DTO-ova stavki jelovnika.</returns>
+        [HttpGet]        [Route("trazi/{uvjet}")]        [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(IQueryable<JelovnikDTORead>))]        [ProducesResponseType(StatusCodes.Status400BadRequest)]        public async Task<ActionResult<List<JelovnikDTORead>>> TraziJelovnikAsync(string uvjet)
+        {
+
+            if (string.IsNullOrEmpty(uvjet) || uvjet.Length < 3)
+
+            {
+
+                return BadRequest(ModelState);
+
+            }
+
+
+
+            uvjet = uvjet.ToLower();
+
+
+
+            try
+
+            {
+
+                IQueryable<Jelovnik> query = _context.Jelovnik;
+
+
+
+
+
+                query = query.Where(j => EF.Functions.Like(j.Kategorija.ToLower(), $"%{uvjet}%") || EF.Functions.Like(j.NazivJela.ToLower(), $"%{uvjet}%"));
+
+
+
+
+
+                var jelovnik = await query.ToListAsync();
+
+
+
+                return Ok(_mapper.Map<List<JelovnikDTORead>>(jelovnik));
+
+            }
+
+            catch (Exception e)
+
+            {
+
+                return BadRequest(new { poruka = e.Message });
+
+            }
+
+        }
+
+        /// <summary>
         /// Pretražuje jelovnik s mogućnošću stranice.
         /// </summary>
         /// <param name="stranica">Broj stranice.</param>
@@ -199,12 +255,13 @@ namespace Backend.Controllers
                 foreach (var s in niz)
                 {
                     query = query.Where(j =>
-                        j.NazivJela.Contains(s)
+                        j.Kategorija.ToLower().Contains(s) ||
+                        j.NazivJela.ToLower().Contains(s)
 
                     );
                 }
 
-                query = query.OrderBy(j => j.NazivJela);
+                query = query.OrderBy(j => j.Kategorija).ThenBy(j => j.NazivJela);
 
                 var j = await Task.Run(() => query.ToList());
                 return Ok(_mapper.Map<List<JelovnikDTORead>>(j.Skip((poStranici * stranica) - poStranici).Take(poStranici)));
@@ -219,9 +276,9 @@ namespace Backend.Controllers
 
 
         /// <summary>
-        /// Postavlja sliku za polaznika.
+        /// Postavlja sliku za jelo.
         /// </summary>
-        /// <param name="sifra">Šifra polaznika.</param>
+        /// <param name="sifra">Šifra jela.</param>
         /// <param name="slika">Podaci o slici.</param>
         /// <returns>Status postavljanja slike.</returns>
         [HttpPut]
@@ -238,10 +295,10 @@ namespace Backend.Controllers
             {
                 return BadRequest("Slika nije postavljena");
             }
-            var p = await _context.Jelovnik.FindAsync(sifra); // Upotreba async metode
-            if (p == null)
+            var j = await _context.Jelovnik.FindAsync(sifra); // Upotreba async metode
+            if (j == null)
             {
-                return BadRequest("Ne postoji polaznik s šifrom " + sifra + ".");
+                return BadRequest("Ne postoji jelo s šifrom " + sifra + ".");
             }
             try
             {
