@@ -19,8 +19,8 @@ export default function RezervacijePromjena() {
 
   const [gosti, setGosti] = useState([]);
   const [stolovi, setStolovi] = useState([]);
-  const [rezervacija, setRezervacija] = useState(null);
-  const [datumVrijeme, setDatumVrijeme] = useState(null);
+  const [rezervacija, setRezervacija] = useState();
+  const [datumVrijeme, setDatumVrijeme] = useState();
 
   async function dohvatiGoste() {
     showLoading();
@@ -38,7 +38,7 @@ export default function RezervacijePromjena() {
 
   async function dohvatiRezervaciju() {
     showLoading();
-    const odgovor = await Service.getById(sifra);
+    const odgovor = await Service.getBySifra(sifra);
     hideLoading();
     if (odgovor.greska) {
       prikaziError(odgovor.poruka);
@@ -80,9 +80,7 @@ export default function RezervacijePromjena() {
     });
   }
 
-  if (!rezervacija) {
-    return <div>Učitavanje...</div>;
-  }
+ 
 
   return (
     <Container>
