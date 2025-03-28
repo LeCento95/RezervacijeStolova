@@ -3,6 +3,9 @@
     width: 100vw;
     height: 100vh;
     overflow: hidden;
+    display: flex; /* Dodato za centriranje */
+    justify-content: center; /* Horizontalno centriranje */
+    align-items: center; /* Vertikalno centriranje */
 }
 
 .background-container::before {

@@ -1,0 +1,38 @@
+.logo-container {
+    position: center;
+    height: 100vh; /* Visina stranice */
+    width: 100vw; /* Širina stranice */
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    overflow: hidden;
+}
+
+.full-page-logo {
+    position: absolute; /* Ispravna pozicija */
+    top: 50%; /* Centriranje vertikalno */
+    left: 50%; /* Centriranje horizontalno */
+    transform: translate(-50%, -50%); /* Pomak za centriranje */
+    height: 80%;
+    width: 90%;
+    object-fit: cover; /* Logo će pokriti celu stranicu */
+    z-index: -1; /* Postavite logo iza teksta */
+}
+
+.welcome-title {
+    color: white;
+    text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.7);
+    font-size: 2rem;
+    text-align: center;
+    z-index: 1; /* Tekst će biti iznad logotipa */
+}
+
+html, body {
+    margin: 0;
+    padding: 0;
+    overflow: hidden; /* Uklanja pomičnu traku */
+    height: 100%; /* Osigurava da tijelo stranice zauzima cijeli prozor */
+    width: 100%;
+    box-sizing: border-box;
+}
+

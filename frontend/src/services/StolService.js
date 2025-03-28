@@ -2,14 +2,14 @@ import { HttpService } from "./HttpService";
 
 async function get() {
   return await HttpService.get('/Stol')
-      .then((odgovor) => {
-          console.table(odgovor.data);
-          return {greska: false, poruka: odgovor.data}; // Promijenjeno da se vraća odgovor.data
-      })
-      .catch((e) => {
-          console.error(e);
-          return []; // Vraća se prazan niz u slučaju greške
-      });
+    .then((odgovor) => {
+      console.table(odgovor.data);
+      return { greska: false, poruka: odgovor.data };
+    })
+    .catch((e) => {
+      console.error(e);
+      return { greska: true, poruka: 'Greška pri dohvatu stolova' }; // Vraća objekt umjesto niza
+    });
 }
 
 async function getBySifra(sifra){

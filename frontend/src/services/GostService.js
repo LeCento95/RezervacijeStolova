@@ -1,14 +1,17 @@
 import { HttpService } from "./HttpService";
 
 
-async function get(){
-  return await HttpService.get('/Gost')
-  .then((odgovor)=>{
-      console.table(odgovor.data);
-      return {greska: false, poruka: odgovor.data};
-  })
-  .catch((e)=>{console.error(e)})
-}
+async function get() {
+    return await HttpService.get('/Gost')
+      .then((odgovor) => {
+        console.table(odgovor.data);
+        return { greska: false, poruka: odgovor.data };
+      })
+      .catch((e) => {
+        console.error(e);
+        return { greska: true, poruka: 'Greška pri dohvatu gostiju' }; // Vraća objekt umjesto niza
+      });
+  }
 
 async function getBySifra(sifra){
   return await HttpService.get('/Gost/' + sifra)

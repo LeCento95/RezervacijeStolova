@@ -32,7 +32,7 @@ export default function GostiPregled() {
 
   useEffect(() => {
     dohvatiGoste();
-  }, [stranica, uvjet]); // Pozivanje funkcije dohvatiGoste kada se promijeni stranica ili uvjet
+  }, [stranica, uvjet]); 
 
   async function obrisiAsync(sifra) {
     showLoading();

@@ -124,9 +124,9 @@ export default function JelovniciPregled() {
                 
             { jelovnici && jelovnici.map((p) => (
            
-           <Col key={p.sifra} sm={12} lg={3} md={3}>
+           <Col key={j.sifra} sm={12} lg={3} md={3}>
               <Card style={{ marginTop: '1rem' }}>
-              <Card.Img variant="top" src={slika(p)} className="slika"/>
+              <Card.Img variant="top" src={slika(j)} className="slika"/>
                 <Card.Body>
                   <Card.Title>{j.nazivJela} {j.kategorija}</Card.Title>
                   <Card.Text>
@@ -134,10 +134,10 @@ export default function JelovniciPregled() {
                   </Card.Text>
                   <Row>
                       <Col>
-                      <Link className="btn btn-primary gumb" to={`/jelovnici/${p.sifra}`}><FaEdit /></Link>
+                      <Link className="btn btn-primary gumb" to={`/jelovnici/${j.sifra}`}><FaEdit /></Link>
                       </Col>
                       <Col>
-                      <Button variant="danger" className="gumb"  onClick={() => obrisi(p.sifra)}><FaTrash /></Button>
+                      <Button variant="danger" className="gumb"  onClick={() => obrisi(j.sifra)}><FaTrash /></Button>
                       </Col>
                     </Row>
                 </Card.Body>

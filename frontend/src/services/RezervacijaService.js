@@ -36,26 +36,42 @@ async function getBySifra(sifra) {
     });
 }
 
-async function dodaj(rezervacija) {
-  return HttpService.post("/Rezervacija", rezervacija)
-    .then(() => {
-      return { greska: false, poruka: "Dodano" };
-    })
-    .catch((e) => {
-      console.error("Greška prilikom dodavanja rezervacije:", e);
-      return { greska: true, poruka: "Problem kod dodavanja rezervacije." };
-    });
+async function dodaj(Rezervacija) {
+  return await HttpService.post('/Rezervacija',Rezervacija)
+  .then((odgovor)=>{
+      return {greska: false, poruka: odgovor.data}
+  })
+  .catch((e)=>{
+      switch (e.status) {
+          case 400:
+              let poruke='';
+              for(const kljuc in e.response.data.errors){
+                  poruke += kljuc + ': ' + e.response.data.errors[kljuc][0] + ', ';
+              }
+              return {greska: true, poruka: poruke}
+          default:
+              return {greska: true, poruka: 'Rezervacija se ne može dodati!'}
+      }
+  })
 }
 
-async function promjena(sifra, rezervacija) {
-  return HttpService.put(`/Rezervacija/${sifra}`, rezervacija)
-    .then(() => {
-      return { greska: false, poruka: "Promijenjeno" };
-    })
-    .catch((e) => {
-      console.error("Greška prilikom promjene rezervacije:", e);
-      return { greska: true, poruka: "Problem kod promjene rezervacije." };
-    });
+async function promjena(sifra,Rezervacija) {
+  return await HttpService.put('/Rezervacija/' + sifra,Rezervacija)
+  .then((odgovor)=>{
+      return {greska: false, poruka: odgovor.data}
+  })
+  .catch((e)=>{
+      switch (e.status) {
+          case 400:
+              let poruke='';
+              for(const kljuc in e.response.data.errors){
+                  poruke += kljuc + ': ' + e.response.data.errors[kljuc][0] + ', ';
+              }
+              return {greska: true, poruka: poruke}
+          default:
+              return {greska: true, poruka: 'Rezervacija se ne može promjeniti!'}
+      }
+  })
 }
 
 async function obrisi(sifra) {
