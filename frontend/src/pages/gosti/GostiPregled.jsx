@@ -36,7 +36,7 @@ export default function GostiPregled() {
 
   async function obrisiAsync(sifra) {
     showLoading();
-    const odgovor = await GostService.delete(sifra);
+    const odgovor = await GostService.obrisi(sifra);
     hideLoading();
     if (odgovor.greska) {
       prikaziError(odgovor.poruka);

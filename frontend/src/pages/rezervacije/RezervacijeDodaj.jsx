@@ -66,10 +66,7 @@ export default function RezervacijeDodaj() {
         showLoading();
         try {
             const odgovor = await Service.dodaj({
-                dto: {
-                    ...rezervacija,
-                    datumVrijeme: datumVrijeme.toISOString()
-                }
+                    rezervacija
             });
             
             if (odgovor.greska) {
