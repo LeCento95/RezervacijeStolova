@@ -20,7 +20,9 @@ namespace Backend.Models.DTO
         [Required(ErrorMessage = "Datum i vrijeme su obavezni.")] 
         DateTime DatumVrijeme,
         
-        [Required(ErrorMessage = "Broj osoba je obavezan.")][Range(1, int.MaxValue, ErrorMessage = "Broj osoba mora biti veći od 0.")] int BrojOsoba,
+        [Required(ErrorMessage = "Broj osoba je obavezan.")][Range(1, int.MaxValue, ErrorMessage = "Broj osoba mora biti veći od 0.")] 
+        int BrojOsoba,
+        
         string Napomena = ""
     );
 
