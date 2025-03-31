@@ -9,11 +9,17 @@ import 'react-datepicker/dist/react-datepicker.css';
 import { RouteNames } from '../../constants';
 import useLoading from "../../hooks/useLoading";
 import useError from '../../hooks/useError';
+import { hr } from 'date-fns/locale';
+import { registerLocale } from 'react-datepicker';
+
+registerLocale('hr', hr);
 
 export default function RezervacijeDodaj() {
     const navigate = useNavigate();
     const { showLoading, hideLoading } = useLoading();
     const { prikaziError } = useError();
+    const [errors, setErrors] = useState({});
+    const [kapaciteti, setKapaciteti] = useState({});
 
     const [gosti, setGosti] = useState([]);
     const [gostSifra, setGostSifra] = useState(0);
@@ -47,6 +53,12 @@ export default function RezervacijeDodaj() {
             if (!odgovor.greska && odgovor.poruka && odgovor.poruka.length > 0) {
                 setStolovi(odgovor.poruka);
                 setStolSifra(odgovor.poruka[0].sifra);
+                
+                const kapacitetMap = {};
+                odgovor.poruka.forEach(stol => {
+                    kapacitetMap[stol.sifra] = stol.kapacitet;
+                });
+                setKapaciteti(kapacitetMap);
             } else {
                 console.error("Nema podataka o stolovima ili je odgovor pogrešan:", odgovor);
             }
@@ -65,17 +77,33 @@ export default function RezervacijeDodaj() {
     async function dodaj(rezervacija) {
         showLoading();
         try {
-            const odgovor = await Service.dodaj({
-                    rezervacija
-            });
+            const timezoneOffset = rezervacija.datumVrijeme.getTimezoneOffset() * 60000;
+            const localISOTime = new Date(rezervacija.datumVrijeme.getTime() - timezoneOffset).toISOString();
+            
+            const payload = {
+                gostSifra: Number(rezervacija.gostSifra),
+                stolSifra: Number(rezervacija.stolSifra),
+                brojOsoba: Number(rezervacija.brojOsoba),
+                datumVrijeme: localISOTime,
+                napomena: rezervacija.napomena || ''
+            };
+
+            console.log('Sending reservation:', payload);
+            
+            const odgovor = await Service.dodaj(payload);
             
             if (odgovor.greska) {
+                if (odgovor.validationErrors) {
+                    setErrors(odgovor.validationErrors);
+                    console.error('Validation errors:', odgovor.validationErrors);
+                }
                 prikaziError(odgovor.poruka);
                 return;
             }
             
             navigate(RouteNames.REZERVACIJA_PREGLED);
         } catch (error) {
+            console.error('Error:', error);
             prikaziError(error.message || 'Došlo je do greške pri dodavanju rezervacije');
         } finally {
             hideLoading();
@@ -84,44 +112,71 @@ export default function RezervacijeDodaj() {
 
     function obradiSubmit(e) {
         e.preventDefault();
+        setErrors({});
         
-        const odabraniGost = gosti.find(gost => gost.sifra === parseInt(e.target.gostSifra.value));
-        const odabraniStol = stolovi.find(stol => stol.sifra === parseInt(e.target.stolSifra.value));
+        const formData = new FormData(e.target);
+        const brojOsoba = parseInt(formData.get('brojOsoba'));
+        const gostSifra = parseInt(formData.get('gostSifra'));
+        const stolSifra = parseInt(formData.get('stolSifra'));
+        const napomena = formData.get('napomena');
         
-        const brojOsoba = parseInt(e.target.brojOsoba.value);
-        if (isNaN(brojOsoba) || brojOsoba <= 0) {
-            prikaziError('Broj osoba mora biti veći od 0');
+        // Enhanced validation
+        const newErrors = {};
+        
+        // Validate guest selection
+        if (isNaN(gostSifra)) newErrors.Gost = 'Morate odabrati gosta';
+        
+        // Validate table selection
+        if (isNaN(stolSifra)) newErrors.Stol = 'Morate odabrati stol';
+        
+        // Validate number of people
+        if (isNaN(brojOsoba)) newErrors.BrojOsoba = 'Broj osoba mora biti broj';
+        else if (brojOsoba <= 0) newErrors.BrojOsoba = 'Broj osoba mora biti veći od 0';
+        else if (kapaciteti[stolSifra] && brojOsoba > kapaciteti[stolSifra]) {
+            newErrors.BrojOsoba = `Broj osoba premašuje kapacitet stola (max: ${kapaciteti[stolSifra]})`;
+        }
+        
+        // Validate date and time
+        if (!datumVrijeme) {
+            newErrors.Datum = 'Datum i vrijeme su obavezni';
+        } else if (datumVrijeme < new Date()) {
+            newErrors.Datum = 'Datum i vrijeme moraju biti u budućnosti';
+        } else {
+            // Additional business rules validation
+            const hours = datumVrijeme.getHours();
+            if (hours < 8 || hours >= 23) {
+                newErrors.Datum = 'Radno vrijeme je od 08:00 do 23:00';
+            }
+        }
+        
+        if (Object.keys(newErrors).length > 0) {
+            setErrors(newErrors);
             return;
         }
-
-
-        if (!odabraniGost || !odabraniStol) {
-            prikaziError('Morate odabrati gosta i stol');
-            return;
-        }
-
+    
         dodaj({
-            gostImePrezime: `${odabraniGost.ime} ${odabraniGost.prezime}`,
-            stolBroj: odabraniStol.brojStola,
-            brojOsoba: parseInt(e.target.brojOsoba.value),
-            napomena: e.target.napomena.value,
-            gostSifra: odabraniGost.sifra,
-            stolSifra: odabraniStol.sifra
+            gostSifra,
+            stolSifra,
+            brojOsoba,
+            napomena,
+            datumVrijeme
         });
+    
     }
 
     return (
         <Container>
             <Row className='mt-2'>
                 <Col sm={12}>
-                    <Form onSubmit={obradiSubmit}>
+                    <Form onSubmit={obradiSubmit} noValidate>
                         <Form.Group className="mb-3" controlId="gostSifra">
                             <Form.Label>Gost</Form.Label>
                             <Form.Select
                                 aria-label="Odaberi gosta"
                                 name="gostSifra"
-                                defaultValue={gostSifra}
-                                disabled={gosti.length === 0}
+                                value={gostSifra}
+                                onChange={(e) => setGostSifra(parseInt(e.target.value))}
+                                isInvalid={!!errors.Gost}
                             >
                                 {gosti.length > 0 ? (
                                     gosti.map((gost) => (
@@ -130,9 +185,12 @@ export default function RezervacijeDodaj() {
                                         </option>
                                     ))
                                 ) : (
-                                    <option>Učitavanje gostiju...</option>
+                                    <option value="">Učitavanje gostiju...</option>
                                 )}
                             </Form.Select>
+                            <Form.Control.Feedback type="invalid">
+                                {errors.Gost}
+                            </Form.Control.Feedback>
                         </Form.Group>
 
                         <Form.Group className="mb-3" controlId="stolSifra">
@@ -140,8 +198,9 @@ export default function RezervacijeDodaj() {
                             <Form.Select
                                 aria-label="Odaberi stol"
                                 name="stolSifra"
-                                defaultValue={stolSifra}
-                                disabled={stolovi.length === 0}
+                                value={stolSifra}
+                                onChange={(e) => setStolSifra(parseInt(e.target.value))}
+                                isInvalid={!!errors.Stol}
                             >
                                 {stolovi.length > 0 ? (
                                     stolovi.map((stol) => (
@@ -150,45 +209,84 @@ export default function RezervacijeDodaj() {
                                         </option>
                                     ))
                                 ) : (
-                                    <option>Učitavanje stolova...</option>
+                                    <option value="">Učitavanje stolova...</option>
                                 )}
                             </Form.Select>
+                            <Form.Control.Feedback type="invalid">
+                                {errors.Stol}
+                            </Form.Control.Feedback>
                         </Form.Group>
 
                         <Form.Group className="mb-3" controlId="datumVrijeme">
-                            <Form.Label>Datum i vrijeme</Form.Label>
-                            <DatePicker
-                                selected={datumVrijeme}
-                                onChange={(date) => setDatumVrijeme(date)}
-                                showTimeSelect
-                                dateFormat="Pp"
-                                name="datumVrijeme"
-                                className='form-control'
-                            />
-                        </Form.Group>
+    <Form.Label>Datum i vrijeme</Form.Label>
+    <DatePicker
+        selected={datumVrijeme}
+        onChange={(date) => {
+            setDatumVrijeme(date);
+            // Clear error when user changes date
+            if (errors.Datum) {
+                setErrors(prev => ({ ...prev, Datum: undefined }));
+            }
+        }}
+        showTimeSelect
+        dateFormat="dd.MM.yyyy HH:mm"
+        timeFormat="HH:mm"
+        timeIntervals={15}
+        minDate={new Date()}
+        maxTime={new Date().setHours(23, 0)}
+        minTime={new Date().setHours(8, 0)}
+        className={`form-control ${errors.Datum ? 'is-invalid' : ''}`}
+        locale="hr"
+        placeholderText="Odaberite datum i vrijeme"
+        autoComplete="off"
+        isClearable
+        filterTime={(time) => {
+            const hours = time.getHours();
+            return hours >= 8 && hours < 23;
+        }}
+    />
+    {errors.Datum && (
+        <div className="invalid-feedback" style={{ display: 'block' }}>
+            {errors.Datum}
+        </div>
+    )}
+</Form.Group>
 
                         <Form.Group className="mb-3" controlId="brojOsoba">
                             <Form.Label>Broj osoba</Form.Label>
-                            <Form.Control 
-                                type="number" 
-                                name="brojOsoba" 
-                                min="1" 
+                            <Form.Control
+                                type="number"
+                                name="brojOsoba"
+                                min="1"
+                                step="1"
                                 defaultValue="1"
                                 required
-                                />
-                        <Form.Control.Feedback type="invalid">
-                                Unesite broj veći od 0
-                        </Form.Control.Feedback>
+                                isInvalid={!!errors.BrojOsoba}
+                                onChange={() => errors.BrojOsoba && setErrors(prev => ({ ...prev, BrojOsoba: undefined }))}
+                            />
+                            <Form.Control.Feedback type="invalid">
+                                {errors.BrojOsoba}
+                            </Form.Control.Feedback>
                         </Form.Group>
 
                         <Form.Group className="mb-3" controlId="napomena">
                             <Form.Label>Napomena</Form.Label>
-                            <Form.Control 
-                                as="textarea" 
-                                name="napomena" 
-                                rows={3} 
+                            <Form.Control
+                                as="textarea"
+                                name="napomena"
+                                rows={3}
+                                isInvalid={!!errors.Napomena}
                             />
+                            <Form.Control.Feedback type="invalid">
+                                {errors.Napomena}
+                            </Form.Control.Feedback>
                         </Form.Group>
+
+                        {errors.general && (
+                            <div className="alert alert-danger">
+                                {errors.general}
+                            </div>
+                        )}
 
                         <Button variant="primary" type="submit">
                             Dodaj

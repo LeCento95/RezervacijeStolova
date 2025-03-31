@@ -16,7 +16,7 @@ export default function JelovniciPromjena() {
     const navigate = useNavigate();
     const {showLoading, hideLoading} = useLoading();
     const routeParams = useParams();
-    const [jelovnik, setJelovnik] = useState({});
+    const [jelovnik, setJelovnici] = useState({});
     const { prikaziError } = useError();
 
     const [trenutnaSlika, setTrenutnaSlika] = useState("");
@@ -32,7 +32,7 @@ export default function JelovniciPromjena() {
             prikaziError(odgovor.poruka);
             return;
         }
-        setJelovnik(odgovor.poruka);
+        setJelovnici(odgovor.poruka); 
 
         if(odgovor.poruka.slika!=null){
             setTrenutnaSlika(PRODUKCIJA + odgovor.poruka.slika + `?${Date.now()}`); 
@@ -127,7 +127,7 @@ export default function JelovniciPromjena() {
 
                 <Form.Group controlId="cijena">
                     <Form.Label>Cijena</Form.Label>
-                    <Form.Control type="date" 
+                    <Form.Control type="number" 
                     step={0.01}
                     name="cijena" defaultValue={jelovnik.cijena}
                     />
@@ -136,7 +136,7 @@ export default function JelovniciPromjena() {
 
                 <Row className='mb-4'>
               <Col key='1' sm={12} lg={6} md={12}>
-                <p className='form-label'>Trenutna slika</p>
+                <j className='form-label'>Trenutna slika</j>
                 <Image
                   //za lokalni development
                   //src={'https://edunovawp1.eu/' + trenutnaSlika}
@@ -147,7 +147,7 @@ export default function JelovniciPromjena() {
               <Col key='2' sm={12} lg={6} md={12}>
                 {slikaZaServer && (
                   <>
-                    <p className='form-label'>Nova slika</p>
+                    <j className='form-label'>Nova slika</j>
                     <Image
                       src={slikaZaServer || slikaZaCrop}
                       className='slika'

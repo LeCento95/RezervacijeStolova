@@ -11,7 +11,7 @@ import useError from '../../hooks/useError';
 
 export default function JelovniciPregled() {
 
-    const [jelovnici, setJelovnici] = useState();
+    const [jelovnici, setJelovnici] = useState([]);
     const [stranica, setStranica] = useState(1);
     const [uvjet, setUvjet] = useState("");
     const { showLoading, hideLoading } = useLoading();
@@ -38,8 +38,8 @@ export default function JelovniciPregled() {
 
     async function obrisiAsync(sifra) {
         showLoading();
+        const odgovor = await Service.obrisi(sifra); 
         hideLoading();
-        console.log(odgovor);
         if (odgovor.greska) {
             prikaziError(odgovor.poruka);
             return;
@@ -51,11 +51,13 @@ export default function JelovniciPregled() {
         obrisiAsync(sifra);
     }
 
-    function slika(jelovnik){
-        if(jelovnik.slika!=null){
-            return PRODUKCIJA + jelovnik.slika+ "?${Date.now()}";
-        }
-        return "";
+    function slika(jelovnik) {
+        if (!jelovnik?.slika) return "";
+        return `${PRODUKCIJA}${jelovnik.slika}?${Date.now()}`;
+    }
+
+    function formatPrice(price) {
+        return `${Number(price).toFixed(2)} €`;
     }
 
     function promjeniUvjet(e) {
@@ -101,10 +103,10 @@ export default function JelovniciPregled() {
                     {jelovnici && jelovnici.length > 0 && (
                             <div style={{ display: "flex", justifyContent: "center" }}>
                                 <Pagination size="lg">
-                                <Pagination.Prev onClick={smanjiStranicu} />
+                                <Pagination.Prev onClick={smanjiStranicu} disabled={stranica === 1} />
                                 <Pagination.Item disabled>{stranica}</Pagination.Item> 
                                 <Pagination.Next
-                                    onClick={povecajStranicu}
+                                    onClick={povecajStranicu} disabled={jelovnici.length < 7}
                                 />
                             </Pagination>
                         </div>
@@ -122,27 +124,32 @@ export default function JelovniciPregled() {
                 
             <Row>
                 
-            { jelovnici && jelovnici.map((p) => (
+            { jelovnici && jelovnici.map((j) => (
            
            <Col key={j.sifra} sm={12} lg={3} md={3}>
-              <Card style={{ marginTop: '1rem' }}>
-              <Card.Img variant="top" src={slika(j)} className="slika"/>
-                <Card.Body>
-                  <Card.Title>{j.nazivJela} {j.kategorija}</Card.Title>
-                  <Card.Text>
-                    {j.kolicina}
-                  </Card.Text>
-                  <Row>
-                      <Col>
-                      <Link className="btn btn-primary gumb" to={`/jelovnici/${j.sifra}`}><FaEdit /></Link>
-                      </Col>
-                      <Col>
-                      <Button variant="danger" className="gumb"  onClick={() => obrisi(j.sifra)}><FaTrash /></Button>
-                      </Col>
-                    </Row>
-                </Card.Body>
-              </Card>
-            </Col>
+                <Card style={{ marginTop: '1rem' }}>
+                    {j.slika && (
+                <Card.Img variant="top" src={slika(j)} className="slika" />
+                )}
+            <Card.Body>
+            <Card.Title>
+                        {j.nazivJela} | {j.kategorija} | {Number(j.cijena).toFixed(2)} €</Card.Title>
+            <Card.Text>{j.kolicina}</Card.Text>
+            <Row>
+                <Col>
+                    <Link className="btn btn-primary gumb" to={`/jelovnici/${j.sifra}`}>
+                        <FaEdit />
+                    </Link>
+                </Col>
+                <Col>
+                    <Button variant="danger" className="gumb" onClick={() => obrisi(j.sifra)}>
+                        <FaTrash />
+                    </Button>
+                </Col>
+            </Row>
+        </Card.Body>
+    </Card>
+</Col>
           ))
       }
       </Row>
@@ -150,10 +157,10 @@ export default function JelovniciPregled() {
               {jelovnici && jelovnici.length > 0 && (
                 <div style={{ display: "flex", justifyContent: "center" }}>
                     <Pagination size="lg">
-                    <Pagination.Prev onClick={smanjiStranicu} />
+                    <Pagination.Prev onClick={smanjiStranicu} disabled={stranica === 1} />
                     <Pagination.Item disabled>{stranica}</Pagination.Item> 
                     <Pagination.Next
-                        onClick={povecajStranicu}
+                        onClick={povecajStranicu} disabled={jelovnici.length < 7}
                     />
                     </Pagination>
                 </div>

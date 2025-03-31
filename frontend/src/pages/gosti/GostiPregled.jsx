@@ -17,7 +17,7 @@ export default function GostiPregled() {
 
   async function dohvatiGoste() {
     showLoading();
-    const odgovor = await GostService.get(stranica, uvjet);
+    const odgovor = await GostService.traziStranicenje(stranica, uvjet);
     hideLoading();
     if (odgovor.greska) {
       prikaziError(odgovor.poruka);
@@ -51,22 +51,18 @@ export default function GostiPregled() {
 
   function promjeniUvjet(e) {
     if (e.key === "Enter") {
-      const noviUvjet = e.target.value;
-      if (noviUvjet.length >= 3) {
-        setStranica(1);
-        setUvjet(noviUvjet);
-        setGosti([]);
-      } else {
-        if (noviUvjet.length > 0) {
-          prikaziError('Uvjet traženja mora imati najmanje 3 slova.');
+        const noviUvjet = e.target.value;
+        if (noviUvjet.length >= 3) {
+            setStranica(1);
+            setUvjet(noviUvjet);
+            setJelovnici([]);
         } else {
-          setStranica(1);
-          setUvjet(noviUvjet);
-          setGosti([]);
+            if (noviUvjet.length > 0) {
+                prikaziError("Uvjet pretrage mora imati barem 3 znaka");
+            }
         }
-      }
     }
-  }
+}
 
   function povecajStranicu() {
     setStranica(stranica + 1);
@@ -89,7 +85,7 @@ export default function GostiPregled() {
             placeholder="Dio imena i prezimena"
             maxLength={255}
             defaultValue=""
-            onChange={promjeniUvjet}
+            onKeyUp={promjeniUvjet}
           />
         </Col>
         <Col key={2} sm={12} lg={4} md={4}>
@@ -98,7 +94,7 @@ export default function GostiPregled() {
               <Pagination size="lg">
                 <Pagination.Prev onClick={smanjiStranicu} disabled={stranica === 1} />
                 <Pagination.Item disabled>{stranica}</Pagination.Item>
-                <Pagination.Next onClick={povecajStranicu} disabled={gosti.length < 10} />
+                <Pagination.Next onClick={povecajStranicu} disabled={gosti.length < 7} />
               </Pagination>
             </div>
           )}
@@ -146,7 +142,7 @@ export default function GostiPregled() {
           <Pagination size="lg">
             <Pagination.Prev onClick={smanjiStranicu} disabled={stranica === 1} />
             <Pagination.Item disabled>{stranica}</Pagination.Item>
-            <Pagination.Next onClick={povecajStranicu} disabled={gosti.length < 10} />
+            <Pagination.Next onClick={povecajStranicu} disabled={gosti.length < 7} />
           </Pagination>
         </div>
       )}

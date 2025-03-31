@@ -15,9 +15,9 @@ export const RouteNames={
     REZERVACIJA_NOVA: '/rezervacije/dodaj',
     REZERVACIJA_PROMJENA: '/rezervacije/:sifra',
 
-    JELOVNIK_PREGLED: '/jelovnik',
-    JELOVNIK_NOVI: '/jelovnik/dodaj',
-    JELOVNIK_PROMJENA: '/jelovnik/:sifra',
+    JELOVNIK_PREGLED: '/jelovnici',
+    JELOVNIK_NOVI: '/jelovnici/dodaj',
+    JELOVNIK_PROMJENA: '/jelovnici/:sifra',
 
     
     
@@ -29,3 +29,4 @@ export const RouteNames={
 }
 
 export const PRODUKCIJA='https://carics95-001-site1.ptempurl.com';
+

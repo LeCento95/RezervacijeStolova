@@ -9,7 +9,7 @@ async function get() {
       })
       .catch((e) => {
         console.error(e);
-        return { greska: true, poruka: 'Greška pri dohvatu gostiju' }; // Vraća objekt umjesto niza
+        return { greska: true, poruka: 'Greška pri dohvatu gostiju' }; 
       });
   }
 

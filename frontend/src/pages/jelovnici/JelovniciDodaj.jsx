@@ -10,9 +10,9 @@ export default function JelovniciDodaj() {
   const { showLoading, hideLoading } = useLoading();
   const { prikaziError } = useError();
 
-  async function dodaj(podaci) {
+  async function dodaj(e) {
     showLoading();
-    const odgovor = await Service.dodaj(podaci);
+    const odgovor = await Service.dodaj(e);
     hideLoading();
     if (odgovor.greska) {
       prikaziError(odgovor.poruka);
