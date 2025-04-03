@@ -1,0 +1,26 @@
+:root {
+    --zoom-factor: 1;
+    --navbar-height: 8vh;
+    --logo-font-size: calc(2rem * var(--zoom-factor));
+  }
+  
+  * {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+  }
+  
+  html {
+    font-size: calc(16px / var(--zoom-factor));
+    height: 100%;
+    overflow-x: hidden;
+  }
+  
+  body {
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    line-height: 1.6;
+    transform-origin: top left;
+    width: 100vw;
+    min-height: 100vh;
+    overflow-x: hidden;
+  }

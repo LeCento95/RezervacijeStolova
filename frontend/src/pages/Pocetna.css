@@ -1,38 +1,163 @@
-.logo-container {
-    position: center;
-    height: 100vh; /* Visina stranice */
-    width: 100vw; /* Širina stranice */
+/* Navbar Container - boje iz loga */
+.navbar {
+    background-color: #4c4e50; /* Tamno siva pozadina kao u logu */
+    color: white; /* Bijeli tekst kao u logu */
     display: flex;
-    justify-content: center;
+    justify-content: space-between;
     align-items: center;
-    overflow: hidden;
-}
-
-.full-page-logo {
-    position: absolute; /* Ispravna pozicija */
-    top: 50%; /* Centriranje vertikalno */
-    left: 50%; /* Centriranje horizontalno */
-    transform: translate(-50%, -50%); /* Pomak za centriranje */
-    height: 80%;
-    width: 90%;
-    object-fit: cover; /* Logo će pokriti celu stranicu */
-    z-index: -1; /* Postavite logo iza teksta */
-}
-
-.welcome-title {
-    color: white;
-    text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.7);
-    font-size: 2rem;
-    text-align: center;
-    z-index: 1; /* Tekst će biti iznad logotipa */
-}
-
-html, body {
-    margin: 0;
-    padding: 0;
-    overflow: hidden; /* Uklanja pomičnu traku */
-    height: 100%; /* Osigurava da tijelo stranice zauzima cijeli prozor */
+    padding: 0.8rem 2rem;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.2);
+    position: sticky;
+    top: 0;
+    z-index: 1000;
+    font-family: 'Arial', sans-serif; /* Čista bezserifna font porodica */
+  }
+  
+  /* Logo Styling - identično logu */
+  .navbar-logo {
+    display: flex;
+    align-items: center;
+    font-size: 1.5rem;
+    font-weight: 700;
+    letter-spacing: 1px;
+    text-decoration: none;
+    color: white; /* Bijeli tekst */
+  }
+  
+  .navbar-logo span:first-child {
+    color: #c24c37; /* Crveni naglasak na "Restorant" */
+    font-weight: 700;
+  }
+  
+  .navbar-logo span.app-name {
+    font-weight: 400;
+    color: white; /* Bijeli tekst za ostatak */
+    font-size: 1rem;
+    margin-left: 0.5rem;
+  }
+  
+  /* Navigation Links - bijeli tekst s crvenim hoverom */
+  .navbar-links {
+    display: flex;
+    gap: 1.5rem;
+    flex-grow: 1;
+    margin-left: 2rem;
+  }
+  
+  .navbar-link {
+    color: white; /* Bijeli tekst */
+    text-decoration: none;
+    font-weight: 500;
+    padding: 0.5rem 0;
+    position: relative;
+    transition: all 0.3s ease;
+    font-size: 0.95rem;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+  }
+  
+  .navbar-link:hover {
+    color: #e74c3c; /* Crvena boja na hover */
+  }
+  
+  .navbar-link.active {
+    color: #e74c3c;
+    font-weight: 600;
+  }
+  
+  .navbar-link::after {
+    content: '';
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    width: 0;
+    height: 2px;
+    background-color: #e74c3c;
+    transition: width 0.3s ease;
+  }
+  
+  .navbar-link:hover::after {
     width: 100%;
-    box-sizing: border-box;
-}
-
+  }
+  
+  /* User Section */
+  .navbar-user {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+  }
+  
+  .navbar-user .username {
+    font-weight: 500;
+    color: white; /* Bijeli tekst */
+  }
+  
+  /* Prijava Button - crveni kao u logu */
+  .navbar-button {
+    background-color: #e74c3c; /* Crvena boja iz loga */
+    color: white;
+    border: none;
+    border-radius: 4px;
+    padding: 0.6rem 1.2rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+    text-transform: uppercase;
+    font-size: 0.85rem;
+    letter-spacing: 0.5px;
+  }
+  
+  .navbar-button:hover {
+    background-color: #c0392b; /* Tamnija nijansa crvene */
+  }
+  
+  /* Mobile Menu Toggle */
+  .navbar-toggle {
+    display: none;
+    cursor: pointer;
+    font-size: 1.5rem;
+    color: white;
+  }
+  
+  /* Responsivnost */
+  @media (max-width: 992px) {
+    .navbar {
+      flex-wrap: wrap;
+      padding: 1rem;
+    }
+    
+    .navbar-links {
+      order: 3;
+      width: 100%;
+      margin: 1rem 0;
+      display: none;
+      flex-direction: column;
+      gap: 0.5rem;
+    }
+    
+    .navbar-links.active {
+      display: flex;
+    }
+    
+    .navbar-link {
+      padding: 0.8rem 0;
+      border-bottom: 1px solid rgba(255,255,255,0.1);
+    }
+    
+    .navbar-toggle {
+      display: block;
+    }
+    
+    .navbar-user {
+      margin-left: auto;
+      margin-right: 1rem;
+    }
+  }
+  
+  /* Divider - svijetlija linija na tamnoj pozadini */
+  .navbar-divider {
+    height: 20px;
+    width: 1px;
+    background-color: rgba(255,255,255,0.3);
+    margin: 0 1rem;
+  }

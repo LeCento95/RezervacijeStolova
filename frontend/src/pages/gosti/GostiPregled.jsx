@@ -55,7 +55,7 @@ export default function GostiPregled() {
         if (noviUvjet.length >= 3) {
             setStranica(1);
             setUvjet(noviUvjet);
-            setJelovnici([]);
+            setGosti([]);
         } else {
             if (noviUvjet.length > 0) {
                 prikaziError("Uvjet pretrage mora imati barem 3 znaka");

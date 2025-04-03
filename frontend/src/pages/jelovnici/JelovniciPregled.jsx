@@ -124,25 +124,25 @@ export default function JelovniciPregled() {
                 
             <Row>
                 
-            { jelovnici && jelovnici.map((j) => (
+            { jelovnici && jelovnici.map((jelovnik) => (
            
-           <Col key={j.sifra} sm={12} lg={3} md={3}>
+           <Col key={jelovnik.sifra} sm={12} lg={3} md={3}>
                 <Card style={{ marginTop: '1rem' }}>
-                    {j.slika && (
-                <Card.Img variant="top" src={slika(j)} className="slika" />
+                    {jelovnik.slika && (
+                <Card.Img variant="top" src={slika(jelovnik)} className="slika" />
                 )}
             <Card.Body>
             <Card.Title>
-                        {j.nazivJela} | {j.kategorija} | {Number(j.cijena).toFixed(2)} €</Card.Title>
-            <Card.Text>{j.kolicina}</Card.Text>
+                        {jelovnik.nazivJela} | {jelovnik.kategorija} | {Number(jelovnik.cijena).toFixed(2)} €</Card.Title>
+            <Card.Text>{jelovnik.kolicina}</Card.Text>
             <Row>
                 <Col>
-                    <Link className="btn btn-primary gumb" to={`/jelovnici/${j.sifra}`}>
+                    <Link className="btn btn-primary gumb" to={`/jelovnici/${jelovnik.sifra}`}>
                         <FaEdit />
                     </Link>
                 </Col>
                 <Col>
-                    <Button variant="danger" className="gumb" onClick={() => obrisi(j.sifra)}>
+                    <Button variant="danger" className="gumb" onClick={() => obrisi(jelovnik.sifra)}>
                         <FaTrash />
                     </Button>
                 </Col>

@@ -1,4 +1,4 @@
-import { HttpService } from "./HttpService";
+import { HttpService } from "/src/services/HttpService.js";
 
 const API_BASE = "https://carics95-001-site1.ptempurl.com/api/v1";
 
@@ -45,7 +45,7 @@ async function dodaj(rezervacija) {
 
     console.log('Sending payload:', payload);
 
-    const response = await HttpService.post('/Rezervacija', payload);
+    const response = await HttpService.post(`${API_BASE}/Rezervacija`, payload);
     
     return {
       greska: false,
@@ -77,9 +77,20 @@ async function dodaj(rezervacija) {
   }
 }
 
-async function promjena(sifra, rezervacija) {
+async function promjeni(sifra, rezervacija) {
   try {
-    const odgovor = await HttpService.put(`${API_BASE}/Rezervacija/${sifra}`, rezervacija);
+    // Ensure proper data formatting for update
+    const payload = {
+      gostSifra: Number(rezervacija.gostSifra),
+      stolSifra: Number(rezervacija.stolSifra),
+      brojOsoba: Number(rezervacija.brojOsoba),
+      datumVrijeme: new Date(rezervacija.datumVrijeme).toISOString(),
+      napomena: rezervacija.napomena || ''
+    };
+
+    console.log('Sending update payload:', payload);
+
+    const odgovor = await HttpService.put(`${API_BASE}/Rezervacija/${sifra}`, payload);
     return { greska: false, poruka: odgovor.data };
   } catch (e) {
     if (e.response?.status === 400) {
@@ -96,6 +107,7 @@ async function promjena(sifra, rezervacija) {
       };
     }
     
+    console.error('API Error:', e);
     return {
       greska: true,
       poruka: e.response?.data?.title || 'Rezervacija se ne može promjeniti!',
@@ -124,6 +136,6 @@ export default {
   get,
   getBySifra,
   dodaj,
-  promjena,
+  promjeni,  // Changed from 'promjena' to match your export
   obrisi,
 };

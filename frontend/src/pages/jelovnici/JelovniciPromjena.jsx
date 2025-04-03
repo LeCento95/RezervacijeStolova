@@ -7,6 +7,8 @@ import { useEffect, useState, useRef } from "react";
 import useLoading from "../../hooks/useLoading";
 import useError from '../../hooks/useError';
 
+import nepoznato from "../../assets/nepoznato.png/";
+
 import Cropper from 'react-cropper';
 import 'cropperjs/dist/cropper.css';
 
@@ -136,7 +138,7 @@ export default function JelovniciPromjena() {
 
                 <Row className='mb-4'>
               <Col key='1' sm={12} lg={6} md={12}>
-                <j className='form-label'>Trenutna slika</j>
+                <p className='form-label'>Trenutna slika</p>
                 <Image
                   //za lokalni development
                   //src={'https://edunovawp1.eu/' + trenutnaSlika}
@@ -147,7 +149,7 @@ export default function JelovniciPromjena() {
               <Col key='2' sm={12} lg={6} md={12}>
                 {slikaZaServer && (
                   <>
-                    <j className='form-label'>Nova slika</j>
+                    <p className='form-label'>Nova slika</p>
                     <Image
                       src={slikaZaServer || slikaZaCrop}
                       className='slika'

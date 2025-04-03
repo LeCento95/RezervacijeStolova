@@ -25,7 +25,39 @@ export default function RezervacijeDodaj() {
     const [gostSifra, setGostSifra] = useState(0);
     const [stolovi, setStolovi] = useState([]);
     const [stolSifra, setStolSifra] = useState(0);
-    const [datumVrijeme, setDatumVrijeme] = useState(new Date());
+    const [datumVrijeme, setDatumVrijeme] = useState(() => {
+        const now = new Date();
+        now.setHours(12, 0, 0, 0); // Default to 12:00 PM
+        return now;
+    });
+
+    // Create proper minTime and maxTime Date objects
+    const [minTime, setMinTime] = useState(() => {
+        const time = new Date();
+        time.setHours(8, 0, 0, 0); // 8:00 AM
+        return time;
+    });
+
+    const [maxTime, setMaxTime] = useState(() => {
+        const time = new Date();
+        time.setHours(22, 45, 0, 0); // 10:45 PM (last reservation at 11:00 PM)
+        return time;
+    });
+
+    // Update time constraints when date changes
+    useEffect(() => {
+        const updateTimeConstraints = () => {
+            const newMinTime = new Date();
+            newMinTime.setHours(8, 0, 0, 0);
+            setMinTime(newMinTime);
+
+            const newMaxTime = new Date();
+            newMaxTime.setHours(22, 45, 0, 0);
+            setMaxTime(newMaxTime);
+        };
+
+        updateTimeConstraints();
+    }, [datumVrijeme]);
 
     async function dohvatiGoste() {
         showLoading();
@@ -77,8 +109,9 @@ export default function RezervacijeDodaj() {
     async function dodaj(rezervacija) {
         showLoading();
         try {
-            const timezoneOffset = rezervacija.datumVrijeme.getTimezoneOffset() * 60000;
-            const localISOTime = new Date(rezervacija.datumVrijeme.getTime() - timezoneOffset).toISOString();
+            const reservationDate = new Date(rezervacija.datumVrijeme);
+            const timezoneOffset = reservationDate.getTimezoneOffset() * 60000;
+            const localISOTime = new Date(reservationDate.getTime() - timezoneOffset).toISOString();
             
             const payload = {
                 gostSifra: Number(rezervacija.gostSifra),
@@ -95,7 +128,6 @@ export default function RezervacijeDodaj() {
             if (odgovor.greska) {
                 if (odgovor.validationErrors) {
                     setErrors(odgovor.validationErrors);
-                    console.error('Validation errors:', odgovor.validationErrors);
                 }
                 prikaziError(odgovor.poruka);
                 return;
@@ -120,31 +152,29 @@ export default function RezervacijeDodaj() {
         const stolSifra = parseInt(formData.get('stolSifra'));
         const napomena = formData.get('napomena');
         
-        // Enhanced validation
         const newErrors = {};
         
-        // Validate guest selection
         if (isNaN(gostSifra)) newErrors.Gost = 'Morate odabrati gosta';
-        
-        // Validate table selection
         if (isNaN(stolSifra)) newErrors.Stol = 'Morate odabrati stol';
         
-        // Validate number of people
-        if (isNaN(brojOsoba)) newErrors.BrojOsoba = 'Broj osoba mora biti broj';
-        else if (brojOsoba <= 0) newErrors.BrojOsoba = 'Broj osoba mora biti veći od 0';
-        else if (kapaciteti[stolSifra] && brojOsoba > kapaciteti[stolSifra]) {
+        if (isNaN(brojOsoba)) {
+            newErrors.BrojOsoba = 'Broj osoba mora biti broj';
+        } else if (brojOsoba <= 0) {
+            newErrors.BrojOsoba = 'Broj osoba mora biti veći od 0';
+        } else if (kapaciteti[stolSifra] && brojOsoba > kapaciteti[stolSifra]) {
             newErrors.BrojOsoba = `Broj osoba premašuje kapacitet stola (max: ${kapaciteti[stolSifra]})`;
         }
         
-        // Validate date and time
         if (!datumVrijeme) {
             newErrors.Datum = 'Datum i vrijeme su obavezni';
-        } else if (datumVrijeme < new Date()) {
-            newErrors.Datum = 'Datum i vrijeme moraju biti u budućnosti';
         } else {
-            // Additional business rules validation
+            const now = new Date();
             const hours = datumVrijeme.getHours();
-            if (hours < 8 || hours >= 23) {
+            const minutes = datumVrijeme.getMinutes();
+            
+            if (datumVrijeme < now) {
+                newErrors.Datum = 'Datum i vrijeme moraju biti u budućnosti';
+            } else if (hours < 8 || (hours >= 23 && minutes > 0)) {
                 newErrors.Datum = 'Radno vrijeme je od 08:00 do 23:00';
             }
         }
@@ -161,7 +191,6 @@ export default function RezervacijeDodaj() {
             napomena,
             datumVrijeme
         });
-    
     }
 
     return (
@@ -218,39 +247,42 @@ export default function RezervacijeDodaj() {
                         </Form.Group>
 
                         <Form.Group className="mb-3" controlId="datumVrijeme">
-    <Form.Label>Datum i vrijeme</Form.Label>
-    <DatePicker
-        selected={datumVrijeme}
-        onChange={(date) => {
-            setDatumVrijeme(date);
-            // Clear error when user changes date
-            if (errors.Datum) {
-                setErrors(prev => ({ ...prev, Datum: undefined }));
-            }
-        }}
-        showTimeSelect
-        dateFormat="dd.MM.yyyy HH:mm"
-        timeFormat="HH:mm"
-        timeIntervals={15}
-        minDate={new Date()}
-        maxTime={new Date().setHours(23, 0)}
-        minTime={new Date().setHours(8, 0)}
-        className={`form-control ${errors.Datum ? 'is-invalid' : ''}`}
-        locale="hr"
-        placeholderText="Odaberite datum i vrijeme"
-        autoComplete="off"
-        isClearable
-        filterTime={(time) => {
-            const hours = time.getHours();
-            return hours >= 8 && hours < 23;
-        }}
-    />
-    {errors.Datum && (
-        <div className="invalid-feedback" style={{ display: 'block' }}>
-            {errors.Datum}
-        </div>
-    )}
-</Form.Group>
+                            <Form.Label>Datum i vrijeme</Form.Label>
+                            <DatePicker
+                                selected={datumVrijeme}
+                                onChange={(date) => {
+                                    if (date) {
+                                        setDatumVrijeme(date);
+                                        if (errors.Datum) {
+                                            setErrors(prev => ({ ...prev, Datum: undefined }));
+                                        }
+                                    }
+                                }}
+                                showTimeSelect
+                                dateFormat="dd.MM.yyyy HH:mm"
+                                timeFormat="HH:mm"
+                                timeIntervals={15}
+                                minDate={new Date()}
+                                minTime={minTime}
+                                maxTime={maxTime}
+                                className={`form-control ${errors.Datum ? 'is-invalid' : ''}`}
+                                locale="hr"
+                                placeholderText="Odaberite datum i vrijeme"
+                                autoComplete="off"
+                                isClearable
+                                filterTime={(time) => {
+                                    const hours = time.getHours();
+                                    return hours >= 8 && hours < 23;
+                                }}
+                                todayButton="Danas"
+                                popperPlacement="auto"
+                            />
+                            {errors.Datum && (
+                                <div className="invalid-feedback" style={{ display: 'block' }}>
+                                    {errors.Datum}
+                                </div>
+                            )}
+                        </Form.Group>
 
                         <Form.Group className="mb-3" controlId="brojOsoba">
                             <Form.Label>Broj osoba</Form.Label>
