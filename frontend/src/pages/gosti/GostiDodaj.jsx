@@ -1,7 +1,7 @@
 import { Button, Col, Form, Row } from "react-bootstrap";
 import { Link, useNavigate } from "react-router-dom";
 import { RouteNames } from "../../constants";
-import GostService from "../../services/GostService";
+import Service from "../../services/GostService";
 import useLoading from "../../hooks/useLoading";
 import useError from "../../hooks/useError";
 
@@ -12,7 +12,7 @@ export default function GostiDodaj() {
 
   async function dodaj(e) {
     showLoading();
-    const odgovor = await GostService.dodaj(e);
+    const odgovor = await Service.dodaj(e);
     hideLoading();
     if (odgovor.greska) {
       prikaziError(odgovor.poruka);

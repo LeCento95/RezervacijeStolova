@@ -1,7 +1,7 @@
 import { Button, Col, Form, Row } from "react-bootstrap";
 import { Link, useNavigate, useParams } from "react-router-dom";
 import { RouteNames } from "../../constants";
-import GostService from "../../services/GostService";
+import Service from "../../services/GostService";
 import { useEffect, useState } from "react";
 import useLoading from "../../hooks/useLoading";
 import useError from '../../hooks/useError';
@@ -18,7 +18,7 @@ export default function GostiPromjena() {
 
     async function dohvatiGosti() {
         showLoading();
-        const odgovor = await GostService.getBySifra(routeParams.sifra);
+        const odgovor = await Service.getBySifra(routeParams.sifra);
         hideLoading();
         if (odgovor.greska) {
             prikaziError(odgovor.poruka);
@@ -34,7 +34,7 @@ export default function GostiPromjena() {
 
     async function promjena(e) {
         showLoading();
-        const odgovor = await GostService.promjena(routeParams.sifra, e);
+        const odgovor = await Service.promjena(routeParams.sifra, e);
         hideLoading();
         if (odgovor.greska) {
             prikaziError(odgovor.poruka);

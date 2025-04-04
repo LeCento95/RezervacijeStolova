@@ -114,8 +114,8 @@ export default function RezervacijeDodaj() {
             const localISOTime = new Date(reservationDate.getTime() - timezoneOffset).toISOString();
             
             const payload = {
-                gostSifra: Number(rezervacija.gostSifra),
-                stolSifra: Number(rezervacija.stolSifra),
+                gost: Number(rezervacija.gostSifra),
+                stol: Number(rezervacija.stolSifra),
                 brojOsoba: Number(rezervacija.brojOsoba),
                 datumVrijeme: localISOTime,
                 napomena: rezervacija.napomena || ''

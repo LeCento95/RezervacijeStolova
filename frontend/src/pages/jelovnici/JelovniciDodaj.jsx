@@ -1,5 +1,5 @@
-import { Button, Form } from "react-bootstrap";
-import { useNavigate } from "react-router-dom";
+import { Button, Form, Row, Col } from "react-bootstrap";
+import { useNavigate, Link } from "react-router-dom";
 import { RouteNames } from "../../constants";
 import Service from "../../services/JelovnikService";
 import useLoading from "../../hooks/useLoading";
@@ -33,39 +33,33 @@ export default function JelovniciDodaj() {
   }
 
   return (
-    <>
-      Dodavanje novoga jela u jelovnik
-      <Form onSubmit={obradiSubmit}>
-        <Form.Group className="mb-3" controlId="nazivJela">
-          <Form.Label>Naziv jela</Form.Label>
-          <Form.Control
-            type="text"
-            placeholder="Unesite naziv jela"
-            name="nazivJela"
-          />
-        </Form.Group>
+   <Row className="justify-content-center">
+      <Col md={6}>
+      <h1>Dodavanje jelovnika</h1>
+        <Form onSubmit={obradiSubmit}>
+          <Form.Group className="mb-3" controlId="nazivJela">
+            <Form.Label>Naziv jela</Form.Label>
+            <Form.Control type="text" name="nazivJela" required />
+          </Form.Group>
 
-        <Form.Group className="mb-3" controlId="kategorija">
-          <Form.Label>Naziv jelovnika</Form.Label>
-          <Form.Control
-            type="text"
-            placeholder="Unesite naziv jelovnika"
-            name="kategorija"
-          />
-        </Form.Group>
+          <Form.Group className="mb-3" controlId="kategorija">
+            <Form.Label>Kategorija</Form.Label>
+            <Form.Control type="text" name="kategorija" required />
+          </Form.Group>
 
-        <Form.Group className="mb-3" controlId="cijena">
-                <Form.Label>Cijena</Form.Label>
-                <Form.Control type="number" 
-                step={0.01} 
-                name="cijena"  
-                />
-            </Form.Group>
+          <Form.Group className="mb-3" controlId="cijena">
+            <Form.Label>Cijena</Form.Label>
+            <Form.Control type="number" name="cijena" step="0.01" required />
+          </Form.Group>
 
-        <Button variant="primary" type="submit">
-          Dodaj jelo
-        </Button>
-      </Form>
-    </>
+          <Button variant="primary" type="submit">
+            Dodaj
+          </Button>
+          <Link to={RouteNames.JELOVNIK_PREGLED} className="btn btn-secondary ms-2">
+            Odustani
+          </Link>
+        </Form>
+      </Col>
+    </Row>
   );
 }

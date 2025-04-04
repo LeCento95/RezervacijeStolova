@@ -3,7 +3,7 @@ import Service from "../../services/JelovnikService";
 import { useEffect, useState } from "react";
 import { PRODUKCIJA, RouteNames } from "../../constants";
 import { Link } from "react-router-dom";
-
+import nepoznato from "../../assets/nepoznato.png";
 import { IoIosAdd } from "react-icons/io";
 import { FaEdit, FaTrash } from "react-icons/fa";
 import useLoading from "../../hooks/useLoading";
@@ -52,12 +52,15 @@ export default function JelovniciPregled() {
     }
 
     function slika(jelovnik) {
-        if (!jelovnik?.slika) return "";
-        return `${PRODUKCIJA}${jelovnik.slika}?${Date.now()}`;
+        if(jelovnik.slika!=null){
+            return PRODUKCIJA + jelovnik.slika + `?${Date.now()}`;
+        }
+        return nepoznato;
     }
 
     function formatPrice(price) {
         return `${Number(price).toFixed(2)} €`;
+        
     }
 
     function promjeniUvjet(e) {
@@ -113,7 +116,7 @@ export default function JelovniciPregled() {
                     )}
                 </Col>
                 <Col key={3} sm={12} lg={4} md={4}>
-                    <Link to={RouteNames.POLAZNIK_NOVI} className="btn btn-success gumb">
+                    <Link to={RouteNames.JELOVNIK_NOVI} className="btn btn-success gumb">
                         <IoIosAdd
                         size={25}
                         /> Dodaj

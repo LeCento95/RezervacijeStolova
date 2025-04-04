@@ -1,16 +1,22 @@
 import { Button, Col, Form, Row } from "react-bootstrap";
 import { Link, useNavigate } from "react-router-dom";
 import { RouteNames } from "../../constants";
-import StolService from "../../services/StolService";
+import Service from "../../services/StolService";
+import useLoading from "../../hooks/useLoading";
+import useError from "../../hooks/useError";
 
 export default function StoloviDodaj() {
   const navigate = useNavigate();
+  const { showLoading, hideLoading } = useLoading();
+  const { prikaziError } = useError();
 
-  async function dodaj(stol) {
+  async function dodaj(e) {
     try {
-      const odgovor = await StolService.dodaj(stol);
+      showLoading();
+      const odgovor = await Service.dodaj(e);
+      hideLoading();
       if (odgovor.greska) {
-        alert(odgovor.poruka);
+        prikaziError(odgovor.poruka);
         return;
       }
       navigate(RouteNames.STOL_PREGLED);
@@ -22,7 +28,7 @@ export default function StoloviDodaj() {
   function odradiSubmit(e) {
     e.preventDefault();
 
-    let podaci = new FormData(e.target);
+    const podaci = new FormData(e.target);
 
     dodaj({
       brojStola: parseInt(podaci.get("brojStola")),

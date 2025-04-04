@@ -1,5 +1,5 @@
 import { Button, Card, Col, Form, Pagination, Row } from "react-bootstrap";
-import GostService from "../../services/GostService";
+import Service from "../../services/GostService";
 import { useEffect, useState } from "react";
 import { RouteNames } from "../../constants";
 import { Link } from "react-router-dom";
@@ -17,7 +17,7 @@ export default function GostiPregled() {
 
   async function dohvatiGoste() {
     showLoading();
-    const odgovor = await GostService.traziStranicenje(stranica, uvjet);
+    const odgovor = await Service.traziStranicenje(stranica, uvjet);
     hideLoading();
     if (odgovor.greska) {
       prikaziError(odgovor.poruka);
@@ -36,7 +36,7 @@ export default function GostiPregled() {
 
   async function obrisiAsync(sifra) {
     showLoading();
-    const odgovor = await GostService.obrisi(sifra);
+    const odgovor = await Service.obrisi(sifra);
     hideLoading();
     if (odgovor.greska) {
       prikaziError(odgovor.poruka);

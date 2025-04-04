@@ -90,7 +90,7 @@ function App() {
       </Container>
       <Container>
         <hr />
-        Edunova &copy; {godina()}
+        RestorantManagerReservation &copy; {godina()}
       </Container>
     </>
   )

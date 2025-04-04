@@ -1,141 +1,79 @@
-import { HttpService } from "/src/services/HttpService.js";
-
-const API_BASE = "https://carics95-001-site1.ptempurl.com/api/v1";
+import { HttpService } from "./HttpService";
 
 async function get() {
-  try {
-    const odgovor = await HttpService.get(`${API_BASE}/Rezervacija`);
-    return { greska: false, poruka: odgovor.data };
-  } catch (e) {
-    console.error("Greška prilikom dohvaćanja rezervacija:", e);
-    return { 
-      greska: true, 
-      poruka: "Greška prilikom dohvaćanja rezervacija.",
-      status: e.response?.status,
-      detalji: e.response?.data
-    };
-  }
+  return await HttpService.get('/Rezervacija')
+    .then((odgovor) => {
+      console.table(odgovor.data);
+      return { greska: false, poruka: odgovor.data };
+    })
+    .catch((e) => {
+      console.error(e);
+      return { greska: true, poruka: 'Greška pri dohvatu rezervacija' }; // Vraća objekt umjesto niza
+    });
 }
 
-async function getBySifra(sifra) {
-  try {
-    const odgovor = await HttpService.get(`${API_BASE}/Rezervacija/${sifra}`);
-    return { greska: false, poruka: odgovor.data };
-  } catch (e) {
-    console.error(`Greška prilikom dohvaćanja rezervacije ${sifra}:`, e);
-    return {
-      greska: true,
-      poruka: e.response?.data?.title || `Greška prilikom dohvaćanja rezervacije ${sifra}`,
-      status: e.response?.status,
-      detalji: e.response?.data
-    };
-  }
+async function getBySifra(sifra){
+  return await HttpService.get('/Rezervacija/' + sifra)
+  .then((odgovor)=>{
+      return {greska: false, poruka: odgovor.data}
+  })
+  .catch(()=>{
+      return {greska: true, poruka: 'Ne postoji Rezervacija!'}
+  })
 }
 
-async function dodaj(rezervacija) {
-  try {
-    // Ensure proper data formatting
-    const payload = {
-      gostSifra: Number(rezervacija.gostSifra),
-      stolSifra: Number(rezervacija.stolSifra),
-      brojOsoba: Number(rezervacija.brojOsoba),
-      datumVrijeme: new Date(rezervacija.datumVrijeme).toISOString(),
-      napomena: rezervacija.napomena || ''
-    };
-
-    console.log('Sending payload:', payload);
-
-    const response = await HttpService.post(`${API_BASE}/Rezervacija`, payload);
-    
-    return {
-      greska: false,
-      poruka: response.data,
-      status: response.status
-    };
-  } catch (error) {
-    console.error('API Error:', error);
-    
-    if (error.response) {
-      const errors = error.response.data?.errors || {};
-      const errorMessages = Object.entries(errors)
-        .map(([field, messages]) => `${field}: ${messages.join(', ')}`)
-        .join('; ');
-
-      return {
-        greska: true,
-        poruka: errorMessages || error.response.data?.title || 'Neispravni podaci',
-        status: error.response.status,
-        validationErrors: errors
-      };
-    }
-
-    return {
-      greska: true,
-      poruka: error.message || 'Došlo je do greške pri spremanju',
-      status: null
-    };
-  }
+async function dodaj(Rezervacija) {
+  return await HttpService.post('/Rezervacija',Rezervacija)
+  .then((odgovor)=>{
+      return {greska: false, poruka: odgovor.data}
+  })
+  .catch((e)=>{
+      switch (e.status) {
+          case 400:
+              let poruke='';
+              for(const kljuc in e.response.data.errors){
+                  poruke += kljuc + ': ' + e.response.data.errors[kljuc][0] + ', ';
+              }
+              return {greska: true, poruka: poruke}
+          default:
+              return {greska: true, poruka: 'Rezervacija se ne može dodati!'}
+      }
+  })
 }
 
-async function promjeni(sifra, rezervacija) {
-  try {
-    // Ensure proper data formatting for update
-    const payload = {
-      gostSifra: Number(rezervacija.gostSifra),
-      stolSifra: Number(rezervacija.stolSifra),
-      brojOsoba: Number(rezervacija.brojOsoba),
-      datumVrijeme: new Date(rezervacija.datumVrijeme).toISOString(),
-      napomena: rezervacija.napomena || ''
-    };
-
-    console.log('Sending update payload:', payload);
-
-    const odgovor = await HttpService.put(`${API_BASE}/Rezervacija/${sifra}`, payload);
-    return { greska: false, poruka: odgovor.data };
-  } catch (e) {
-    if (e.response?.status === 400) {
-      const errors = e.response.data?.errors || {};
-      const poruke = Object.entries(errors)
-        .map(([field, messages]) => `${field}: ${messages.join(', ')}`)
-        .join('; ');
-      
-      return {
-        greska: true,
-        poruka: poruke || e.response.data?.title || 'Neispravni podaci',
-        status: 400,
-        validationErrors: errors
-      };
-    }
-    
-    console.error('API Error:', e);
-    return {
-      greska: true,
-      poruka: e.response?.data?.title || 'Rezervacija se ne može promjeniti!',
-      status: e.response?.status,
-      detalji: e.response?.data
-    };
-  }
+async function promjena(sifra,Rezervacija) {
+  return await HttpService.put('/Rezervacija/' + sifra,Rezervacija)
+  .then((odgovor)=>{
+      return {greska: false, poruka: odgovor.data}
+  })
+  .catch((e)=>{
+      switch (e.status) {
+          case 400:
+              let poruke='';
+              for(const kljuc in e.response.data.errors){
+                  poruke += kljuc + ': ' + e.response.data.errors[kljuc][0] + ', ';
+              }
+              return {greska: true, poruka: poruke}
+          default:
+              return {greska: true, poruka: 'Rezervacija se ne može promjeniti!'}
+      }
+  })
 }
 
 async function obrisi(sifra) {
-  try {
-    await HttpService.delete(`${API_BASE}/Rezervacija/${sifra}`);
-    return { greska: false, poruka: "Obrisano" };
-  } catch (e) {
-    console.error("Greška prilikom brisanja rezervacije:", e);
-    return {
-      greska: true,
-      poruka: e.response?.data?.title || 'Problem kod brisanja rezervacije',
-      status: e.response?.status,
-      detalji: e.response?.data
-    };
-  }
+  return HttpService.delete(`/Rezervacija/${sifra}`)
+    .then(() => {
+      return { greska: false, poruka: "Obrisano" };
+    })
+    .catch(() => {
+      return { greska: true, poruka: "Problem kod brisanja" };
+    });
 }
 
 export default {
   get,
   getBySifra,
   dodaj,
-  promjeni,  // Changed from 'promjena' to match your export
+  promjena,
   obrisi,
 };

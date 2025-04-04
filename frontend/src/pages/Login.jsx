@@ -2,9 +2,11 @@ import Container from 'react-bootstrap/Container';
 import Button from 'react-bootstrap/Button';
 import Form from 'react-bootstrap/Form';
 import { useState } from 'react';
+import { useNavigate } from 'react-router-dom'; // Dodajte ovaj import
 
 export default function Login() {
   const [prijavljeniPodaci, setPrijavljeniPodaci] = useState(null);
+  const navigate = useNavigate(); // Dodajte ovu liniju
 
   function handleSubmit(e) {
     e.preventDefault();
@@ -15,6 +17,11 @@ export default function Login() {
 
     // Simulacija prijave (bez stvarne autentifikacije)
     setPrijavljeniPodaci({ email, lozinka });
+    
+    // Redirekcija na početnu stranicu nakon 2 sekunde (simulacija)
+    setTimeout(() => {
+      navigate('/'); // Promenite '/' u željenu rutu ako je drugačija
+    }, 2000);
   }
 
   return (
@@ -27,6 +34,7 @@ export default function Login() {
           <p>Prijavljeni ste s:</p>
           <p>Email: {prijavljeniPodaci.email}</p>
           <p>Lozinka: {prijavljeniPodaci.lozinka}</p>
+          <p>Preusmeravam na početnu stranicu...</p>
         </div>
       ) : (
         <Form onSubmit={handleSubmit}>

@@ -38,6 +38,7 @@ export default function RezervacijePregled() {
 
   useEffect(() => {
     dohvatiRezervacije();
+    
   }, []);
 
   return (

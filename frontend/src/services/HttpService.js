@@ -25,19 +25,31 @@ HttpService.interceptors.request.use(
 
 // Add response interceptor
 HttpService.interceptors.response.use(
-  (response) => response,
+  (response) => {
+    // Standardize successful responses
+    return {
+      data: response.data,
+      status: response.status,
+      success: true
+    };
+  },
   (error) => {
-    if (error.response) {
-      // The request was made and the server responded with a status code
-      console.error('Response error:', error.response.status, error.response.data);
-    } else if (error.request) {
-      // The request was made but no response was received
-      console.error('Request error:', error.request);
-    } else {
-      // Something happened in setting up the request
-      console.error('Error:', error.message);
+    // Standardize error responses
+    const errorResponse = {
+      success: false,
+      message: error.message,
+      status: error.response?.status,
+      data: error.response?.data
+    };
+
+    if (error.response?.data?.errors) {
+      // Format validation errors
+      errorResponse.errors = Object.entries(error.response.data.errors)
+        .map(([field, messages]) => `${field}: ${messages.join(', ')}`)
+        .join('; ');
     }
-    return Promise.reject(error);
+
+    return Promise.reject(errorResponse);
   }
 );
 
