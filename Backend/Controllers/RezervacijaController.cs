@@ -86,16 +86,16 @@ namespace Backend.Controllers
                 return BadRequest(new { poruka = ModelState });
             }
 
-            var g = await _context.Gosti.FindAsync(dto.Gost);
+            var g = await _context.Gosti.FindAsync(dto.GostSifra);
             if (g == null)
             {
-                return BadRequest(new { poruka = $"Gost sa šifrom {dto.Gost} ne postoji." });
+                return BadRequest(new { poruka = $"Gost sa šifrom {dto.GostSifra} ne postoji." });
             }
 
-            var s = await _context.Stolovi.FindAsync(dto.Stol);
+            var s = await _context.Stolovi.FindAsync(dto.StolSifra);
             if (s == null)
             {
-                return BadRequest(new { poruka = $"Stol sa šifrom {dto.Stol} ne postoji." });
+                return BadRequest(new { poruka = $"Stol sa šifrom {dto.StolSifra} ne postoji." });
             }
 
             try
@@ -144,16 +144,16 @@ namespace Backend.Controllers
                     return NotFound(new { poruka = $"Rezervacija sa šifrom {sifra} ne postoji." });
                 }
 
-                var g = await _context.Gosti.FindAsync(dto.Gost);
+                var g = await _context.Gosti.FindAsync(dto.GostSifra);
                 if (g == null)
                 {
-                    return BadRequest(new { poruka = $"Gost sa šifrom {dto.Gost} ne postoji." });
+                    return BadRequest(new { poruka = $"Gost sa šifrom {dto.GostSifra} ne postoji." });
                 }
 
-                var s = await _context.Stolovi.FindAsync(dto.Stol);
+                var s = await _context.Stolovi.FindAsync(dto.StolSifra);
                 if (s == null)
                 {
-                    return BadRequest(new { poruka = $"Stol sa šifrom {dto.Stol} ne postoji." });
+                    return BadRequest(new { poruka = $"Stol sa šifrom {dto.StolSifra} ne postoji." });
                 }
 
                 _mapper.Map(dto, rez);
